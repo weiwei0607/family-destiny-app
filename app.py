@@ -478,5 +478,40 @@ def report_compatibility():
     )
 
 
+@app.route('/report/family', methods=['GET', 'POST'])
+def report_family():
+    """家庭報告頁面（含付費牆）"""
+    if request.method == 'POST':
+        names = request.form.getlist('names[]')
+        genders = request.form.getlist('genders[]')
+        dates = request.form.getlist('dates[]')
+        times = request.form.getlist('times[]')
+    else:
+        names = request.args.getlist('names[]')
+        genders = request.args.getlist('genders[]')
+        dates = request.args.getlist('dates[]')
+        times = request.args.getlist('times[]')
+    
+    if len(names) < 2 or len(names) > 6:
+        return "家庭成員數量需在 2-6 人之間", 400
+    
+    members_data = []
+    for i in range(len(names)):
+        members_data.append({
+            'name': names[i],
+            'gender': genders[i] if i < len(genders) else '女',
+            'date': dates[i] if i < len(dates) else '2000-01-01',
+            'time': times[i] if i < len(times) else '12:00',
+            'location': 'taipei'
+        })
+    
+    result = _generate_family_report(members_data)
+    return render_template('report_family.html',
+        members=result['members'],
+        matrix=result['relationship_matrix'],
+        dynamics=result['family_dynamics']
+    )
+
+
 if __name__ == '__main__':
     app.run(debug=True, port=5001)
