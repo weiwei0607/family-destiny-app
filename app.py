@@ -59,11 +59,11 @@ def _analyze_person(data):
     except Exception:
         zw = {'命宮': '未知', '身宮': '未知', '五行局': '未知', '紫微': '未知', '天府': '未知', '主星': {}, '輔星': {}, '四化': {}}
 
-    # 5. 人類圖
+    # 5. 人類圖（完整 Personality + Design 層）
     try:
-        hd = humandesign.calculate(planets_longitudes)
+        hd = humandesign.calculate_hd(dt)
     except Exception:
-        hd = {'energy_type': '未知', 'profile': '未知', 'authority': '未知', 'defined_gates': [], 'active_channels': [], 'defined_centers': [], 'gate_details': {}}
+        hd = {'energy_type': '未知', 'profile': '未知', 'authority': '未知', 'strategy': '未知', 'not_self': '未知', 'definition': '未知', 'defined_gates': [], 'active_channels': [], 'defined_centers': [], 'personality_details': {}, 'design_details': {}}
 
     # 6. 星宿
     try:
