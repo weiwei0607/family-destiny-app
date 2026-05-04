@@ -47,8 +47,10 @@ def _analyze_person(data):
     # 4. 紫微斗數
     try:
         year_gan = bz['year'][0]
+        year_zhi = bz['year'][1]
         zw = ziwei.ziwei_chart(
             year_gan=year_gan,
+            year_zhi=year_zhi,
             lunar_month=lunar['lunar_month'],
             lunar_day=lunar['lunar_day'],
             hour_idx=_hour_idx(dt),

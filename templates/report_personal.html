@@ -150,17 +150,64 @@
           <span class="text-lg">🔮</span>
           <h3 class="font-bold text-white/90">紫微斗數</h3>
         </div>
-        <div class="flex items-center justify-between mb-3">
-          <span class="text-sm text-white/50">命宮</span>
-          <span class="serif font-bold text-amber-300">{{ ziwei.命宮 }}</span>
+        <div class="space-y-2 mb-3 text-sm">
+          <div class="flex items-center justify-between">
+            <span class="text-white/50">命宮</span>
+            <span class="serif font-bold text-amber-300">{{ ziwei.命宮 }}</span>
+          </div>
+          <div class="flex items-center justify-between">
+            <span class="text-white/50">五行局</span>
+            <span class="text-white/80">{{ ziwei.五行局 }}</span>
+          </div>
+          <div class="flex items-center justify-between">
+            <span class="text-white/50">紫微</span>
+            <span class="text-white/80">{{ ziwei.紫微 }}宮</span>
+          </div>
+          <div class="flex items-center justify-between">
+            <span class="text-white/50">天府</span>
+            <span class="text-white/80">{{ ziwei.天府 }}宮</span>
+          </div>
+          {% if ziwei.四化 %}
+          <div class="flex items-center justify-between">
+            <span class="text-white/50">四化</span>
+            <span class="text-xs text-amber-400/80">{% for h, star in ziwei.四化.items() %}{{ h }}{{ star }} {% endfor %}</span>
+          </div>
+          {% endif %}
         </div>
-        <div class="flex flex-wrap gap-1.5">
-          {% for star, pos in ziwei.主星.items() %}
-            {% if pos %}
+        <div class="mb-2">
+          <p class="text-[10px] text-white/30 mb-1.5">主星</p>
+          <div class="flex flex-wrap gap-1.5">
+            {% for star, pos in ziwei.主星.items() %}
             <span class="px-2 py-1 rounded-lg bg-white/5 text-xs text-white/70">{{ star }}</span>
-            {% endif %}
-          {% endfor %}
+            {% endfor %}
+          </div>
         </div>
+        {% if ziwei.祿存 %}
+        <div class="mb-2">
+          <p class="text-[10px] text-white/30 mb-1.5">吉曜</p>
+          <div class="flex flex-wrap gap-1.5">
+            <span class="px-2 py-1 rounded-lg bg-amber-500/10 text-xs text-amber-300">祿存 {{ ziwei.祿存 }}</span>
+            <span class="px-2 py-1 rounded-lg bg-amber-500/10 text-xs text-amber-300">天魁 {{ ziwei.天魁 }}</span>
+            <span class="px-2 py-1 rounded-lg bg-amber-500/10 text-xs text-amber-300">天鉞 {{ ziwei.天鉞 }}</span>
+            <span class="px-2 py-1 rounded-lg bg-amber-500/10 text-xs text-amber-300">天馬 {{ ziwei.天馬 }}</span>
+            <span class="px-2 py-1 rounded-lg bg-rose-500/10 text-xs text-rose-300">紅鸞 {{ ziwei.紅鸞 }}</span>
+            <span class="px-2 py-1 rounded-lg bg-rose-500/10 text-xs text-rose-300">天喜 {{ ziwei.天喜 }}</span>
+          </div>
+        </div>
+        {% endif %}
+        {% if ziwei.擎羊 %}
+        <div>
+          <p class="text-[10px] text-white/30 mb-1.5">煞曜</p>
+          <div class="flex flex-wrap gap-1.5">
+            <span class="px-2 py-1 rounded-lg bg-red-500/10 text-xs text-red-300">擎羊 {{ ziwei.擎羊 }}</span>
+            <span class="px-2 py-1 rounded-lg bg-red-500/10 text-xs text-red-300">陀羅 {{ ziwei.陀羅 }}</span>
+            <span class="px-2 py-1 rounded-lg bg-red-500/10 text-xs text-red-300">火星 {{ ziwei.火星 }}</span>
+            <span class="px-2 py-1 rounded-lg bg-red-500/10 text-xs text-red-300">鈴星 {{ ziwei.鈴星 }}</span>
+            <span class="px-2 py-1 rounded-lg bg-purple-500/10 text-xs text-purple-300">地空 {{ ziwei.地空 }}</span>
+            <span class="px-2 py-1 rounded-lg bg-purple-500/10 text-xs text-purple-300">地劫 {{ ziwei.地劫 }}</span>
+          </div>
+        </div>
+        {% endif %}
       </div>
 
       <!-- 人類圖 -->
@@ -303,18 +350,22 @@
         </div>
 
         <!-- Data pills -->
-        <div class="grid grid-cols-3 gap-2 text-center">
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-2 text-center">
           <div class="rounded-xl bg-amber-500/10 border border-amber-500/20 p-2 hd-data" style="opacity:0;animation:hdReveal 0.5s ease 1.2s forwards">
             <p class="text-[10px] text-white/40 mb-0.5">能量類型</p>
             <p class="text-xs font-bold text-amber-300">{{ humandesign.energy_type }}</p>
           </div>
-          <div class="rounded-xl bg-white/5 border border-white/10 p-2 hd-data" style="opacity:0;animation:hdReveal 0.5s ease 1.4s forwards">
+          <div class="rounded-xl bg-white/5 border border-white/10 p-2 hd-data" style="opacity:0;animation:hdReveal 0.5s ease 1.35s forwards">
             <p class="text-[10px] text-white/40 mb-0.5">人生角色</p>
             <p class="text-xs font-bold text-white/80">{{ humandesign.profile }}</p>
           </div>
-          <div class="rounded-xl bg-white/5 border border-white/10 p-2 hd-data" style="opacity:0;animation:hdReveal 0.5s ease 1.6s forwards">
+          <div class="rounded-xl bg-white/5 border border-white/10 p-2 hd-data" style="opacity:0;animation:hdReveal 0.5s ease 1.5s forwards">
             <p class="text-[10px] text-white/40 mb-0.5">內在權威</p>
             <p class="text-xs font-bold text-white/80">{{ humandesign.authority }}</p>
+          </div>
+          <div class="rounded-xl bg-emerald-500/10 border border-emerald-500/20 p-2 hd-data" style="opacity:0;animation:hdReveal 0.5s ease 1.65s forwards">
+            <p class="text-[10px] text-white/40 mb-0.5">策略</p>
+            <p class="text-xs font-bold text-emerald-300">{{ humandesign.strategy }}</p>
           </div>
         </div>
       </div>
