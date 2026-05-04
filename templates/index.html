@@ -1,748 +1,236 @@
 <!DOCTYPE html>
 <html lang="zh-TW">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Family Translator · 家庭關係翻譯師</title>
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body {
-            font-family: 'PingFang HK', 'Hiragino Sans GB', 'Microsoft JhengHei', sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            color: #333;
-        }
-        .container { max-width: 900px; margin: 0 auto; padding: 20px; }
-        
-        /* Header */
-        .header {
-            text-align: center;
-            padding: 40px 20px;
-            color: white;
-        }
-        .header h1 { font-size: 2.5em; margin-bottom: 10px; }
-        .header p { font-size: 1.1em; opacity: 0.9; }
-        
-        /* Mode Switcher */
-        .mode-switcher {
-            display: flex;
-            justify-content: center;
-            gap: 10px;
-            margin-bottom: 30px;
-        }
-        .mode-btn {
-            padding: 12px 30px;
-            border: 2px solid white;
-            background: transparent;
-            color: white;
-            border-radius: 30px;
-            cursor: pointer;
-            font-size: 1em;
-            transition: all 0.3s;
-        }
-        .mode-btn:hover, .mode-btn.active {
-            background: white;
-            color: #667eea;
-        }
-        .mode-btn.premium::after {
-            content: ' 💎';
-        }
-        
-        /* Card */
-        .card {
-            background: white;
-            border-radius: 20px;
-            padding: 30px;
-            margin-bottom: 20px;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
-        }
-        .card h2 {
-            color: #667eea;
-            margin-bottom: 20px;
-            font-size: 1.5em;
-        }
-        
-        /* Form */
-        .form-group {
-            margin-bottom: 15px;
-        }
-        .form-group label {
-            display: block;
-            margin-bottom: 5px;
-            font-weight: 600;
-            color: #555;
-        }
-        .form-group input, .form-group select {
-            width: 100%;
-            padding: 12px;
-            border: 2px solid #e0e0e0;
-            border-radius: 10px;
-            font-size: 1em;
-            transition: border-color 0.3s;
-        }
-        .form-group input:focus, .form-group select:focus {
-            outline: none;
-            border-color: #667eea;
-        }
-        .form-row {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 15px;
-        }
-        
-        /* Submit Button */
-        .submit-btn {
-            width: 100%;
-            padding: 15px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border: none;
-            border-radius: 10px;
-            font-size: 1.1em;
-            cursor: pointer;
-            transition: transform 0.2s;
-            margin-top: 10px;
-        }
-        .submit-btn:hover { transform: translateY(-2px); }
-        .submit-btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
-        
-        /* Report Tabs */
-        .report-tabs {
-            display: flex;
-            gap: 5px;
-            margin-bottom: 20px;
-            overflow-x: auto;
-        }
-        .report-tab {
-            padding: 10px 20px;
-            background: #f0f0f0;
-            border: none;
-            border-radius: 20px;
-            cursor: pointer;
-            white-space: nowrap;
-            transition: all 0.3s;
-        }
-        .report-tab:hover, .report-tab.active {
-            background: #667eea;
-            color: white;
-        }
-        
-        /* Report Content */
-        .report-content {
-            display: none;
-        }
-        .report-content.active {
-            display: block;
-        }
-        
-        /* Score Card */
-        .score-card {
-            text-align: center;
-            padding: 30px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border-radius: 15px;
-            margin-bottom: 20px;
-        }
-        .score-card .score {
-            font-size: 4em;
-            font-weight: bold;
-        }
-        .score-card .stars {
-            font-size: 2em;
-            margin: 10px 0;
-        }
-        .score-card .summary {
-            font-size: 1.1em;
-            opacity: 0.95;
-        }
-        
-        /* Dimension Cards */
-        .dimension-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 15px;
-            margin: 20px 0;
-        }
-        .dimension-card {
-            background: #f8f9fa;
-            padding: 20px;
-            border-radius: 15px;
-            border-left: 4px solid #667eea;
-        }
-        .dimension-card h4 {
-            color: #667eea;
-            margin-bottom: 10px;
-        }
-        .dimension-card .stars {
-            color: #ffc107;
-            font-size: 1.2em;
-            margin-bottom: 10px;
-        }
-        
-        /* Prescription */
-        .prescription {
-            background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
-            border-radius: 15px;
-            padding: 25px;
-            margin-top: 20px;
-        }
-        .prescription h3 {
-            color: #2e7d32;
-            margin-bottom: 15px;
-            font-size: 1.3em;
-        }
-        .prescription-item {
-            display: flex;
-            align-items: start;
-            gap: 10px;
-            margin-bottom: 12px;
-            padding: 10px;
-            background: white;
-            border-radius: 10px;
-        }
-        .prescription-item .icon {
-            font-size: 1.5em;
-        }
-        .prescription-item .text {
-            flex: 1;
-        }
-        .prescription-item .text strong {
-            color: #2e7d32;
-        }
-        
-        /* Paywall */
-        .paywall {
-            text-align: center;
-            padding: 40px;
-            background: linear-gradient(135deg, #fff3e0 0%, #ffe0b2 100%);
-            border-radius: 15px;
-            margin: 20px 0;
-        }
-        .paywall h3 {
-            color: #e65100;
-            margin-bottom: 15px;
-        }
-        .paywall .price-options {
-            display: flex;
-            justify-content: center;
-            gap: 15px;
-            margin: 20px 0;
-            flex-wrap: wrap;
-        }
-        .price-option {
-            background: white;
-            padding: 20px;
-            border-radius: 15px;
-            min-width: 150px;
-            cursor: pointer;
-            transition: transform 0.2s;
-            border: 2px solid transparent;
-        }
-        .price-option:hover, .price-option.recommended {
-            transform: translateY(-5px);
-            border-color: #ff9800;
-        }
-        .price-option .price {
-            font-size: 2em;
-            font-weight: bold;
-            color: #e65100;
-        }
-        .price-option .period {
-            color: #666;
-            font-size: 0.9em;
-        }
-        .price-option.recommended::before {
-            content: '推薦';
-            display: block;
-            background: #ff9800;
-            color: white;
-            padding: 2px 10px;
-            border-radius: 10px;
-            font-size: 0.8em;
-            margin-bottom: 10px;
-        }
-        
-        /* Hidden sections */
-        .hidden { display: none; }
-        
-        /* Loading */
-        .loading {
-            text-align: center;
-            padding: 40px;
-        }
-        .loading::after {
-            content: '分析中...';
-            display: block;
-            margin-top: 10px;
-            color: #667eea;
-        }
-
-        /* Info table */
-        .info-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin: 10px 0;
-        }
-        .info-table th, .info-table td {
-            padding: 10px;
-            text-align: left;
-            border-bottom: 1px solid #eee;
-        }
-        .info-table th {
-            color: #667eea;
-            width: 30%;
-        }
-
-        /* Pill */
-        .pill {
-            display: inline-block;
-            padding: 4px 12px;
-            background: #f0f0f0;
-            border-radius: 12px;
-            font-size: 0.9em;
-            margin: 2px;
-        }
-        .pill.primary {
-            background: #667eea;
-            color: white;
-        }
-        
-        @media (max-width: 600px) {
-            .form-row { grid-template-columns: 1fr; }
-            .header h1 { font-size: 1.8em; }
-            .price-options { flex-direction: column; align-items: center; }
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Family Destiny · 家庭關係翻譯師</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;600;700;900&family=Noto+Sans+TC:wght@300;400;500;700&display=swap" rel="stylesheet">
+<style>
+  body {
+    font-family: 'Noto Sans TC', sans-serif;
+    background: #0f0f12;
+    color: #e8e6e3;
+  }
+  .serif { font-family: 'Noto Serif TC', serif; }
+  .gradient-text {
+    background: linear-gradient(135deg, #d4af37 0%, #f5e6a3 50%, #d4af37 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .card-glass {
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.06);
+    backdrop-filter: blur(10px);
+  }
+  input, select {
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.1);
+    color: white;
+  }
+  input:focus, select:focus {
+    outline: none;
+    border-color: rgba(212,175,55,0.5);
+  }
+  .tab-active {
+    background: rgba(212,175,55,0.15);
+    border-color: rgba(212,175,55,0.4);
+    color: #d4af37;
+  }
+</style>
 </head>
-<body>
-    <div class="container">
-        <!-- Header -->
-        <div class="header">
-            <h1>🔮 Family Translator</h1>
-            <p>輸入生日，拿到自己的使用手冊 + 家庭的溝通指南</p>
-        </div>
-        
-        <!-- Mode Switcher -->
-        <div class="mode-switcher">
-            <button class="mode-btn active" onclick="switchMode('personal')">🧑 個人模式（免費）</button>
-            <button class="mode-btn premium" onclick="switchMode('love')">💕 戀愛合盤（付費）</button>
-            <button class="mode-btn premium" onclick="switchMode('family')">👨‍👩‍👧‍👦 家庭合盤（付費）</button>
-        </div>
-        
-        <!-- Personal Mode -->
-        <div id="personal-mode" class="card">
-            <h2>🧑 個人模式 · 免費</h2>
-            <p style="margin-bottom: 20px; color: #666;">輸入你的出生資料，拿到完整的五系統整合畫像 + 生活處方籤</p>
-            
-            <form id="personal-form">
-                <div class="form-row">
-                    <div class="form-group">
-                        <label>姓名（或暱稱）</label>
-                        <input type="text" id="p-name" placeholder="例如：韡寧">
-                    </div>
-                    <div class="form-group">
-                        <label>性別</label>
-                        <select id="p-gender">
-                            <option value="女">女</option>
-                            <option value="男">男</option>
-                        </select>
-                    </div>
-                </div>
-                <div class="form-row">
-                    <div class="form-group">
-                        <label>出生日期</label>
-                        <input type="date" id="p-date" required>
-                    </div>
-                    <div class="form-group">
-                        <label>出生時間</label>
-                        <input type="time" id="p-time" value="12:00">
-                    </div>
-                </div>
-                <div class="form-row">
-                    <div class="form-group">
-                        <label>出生地點</label>
-                        <select id="p-location">
-                            <option value="taipei">台北/新北</option>
-                            <option value="taichung">台中</option>
-                            <option value="kaohsiung">高雄</option>
-                            <option value="other">其他</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label> </label>
-                        <button type="submit" class="submit-btn" id="p-submit">🔮 生成我的使用手冊</button>
-                    </div>
-                </div>
-            </form>
-            
-            <div id="personal-loading" class="loading hidden"></div>
+<body class="min-h-screen">
 
-            <!-- Personal Report -->
-            <div id="personal-report" class="hidden">
-                <div class="score-card">
-                    <div class="score" id="p-energy-score">--</div>
-                    <div class="stars" id="p-stars">⭐⭐⭐⭐</div>
-                    <div class="summary" id="p-summary">--</div>
-                </div>
-                
-                <div class="report-tabs">
-                    <button class="report-tab active" onclick="switchTab('p-integrated')">整合畫像</button>
-                    <button class="report-tab" onclick="switchTab('p-bazi')">八字</button>
-                    <button class="report-tab" onclick="switchTab('p-astro')">占星</button>
-                    <button class="report-tab" onclick="switchTab('p-ziwei')">紫微</button>
-                    <button class="report-tab" onclick="switchTab('p-hd')">人類圖</button>
-                    <button class="report-tab" onclick="switchTab('p-xingxiu')">星宿</button>
-                    <button class="report-tab" onclick="switchTab('p-prescription')">💊 處方籤</button>
-                </div>
-                
-                <div id="p-integrated" class="report-content active">
-                    <h3>五系統整合畫像</h3>
-                    <div class="dimension-grid" id="p-integrated-grid">
-                        <!-- JS 動態填入 -->
-                    </div>
-                    <div class="card" style="background: #f8f9fa;">
-                        <h4>人生課題</h4>
-                        <p id="p-life-topic">你的課題不是「更努力」，是「允許自己不當家」。你是庚金，天生會保護別人，但你需要學會「被保護」。</p>
-                    </div>
-                </div>
-                
-                <div id="p-prescription" class="report-content">
-                    <div class="prescription">
-                        <h3>💊 生活處方籤</h3>
-                        <div id="p-prescription-list">
-                            <!-- JS 動態填入 -->
-                        </div>
-                    </div>
-                </div>
-                
-                <div id="p-bazi" class="report-content">
-                    <h3>八字四柱</h3>
-                    <table class="info-table" id="p-bazi-table"></table>
-                </div>
-                <div id="p-astro" class="report-content">
-                    <h3>西洋占星</h3>
-                    <table class="info-table" id="p-astro-table"></table>
-                </div>
-                <div id="p-ziwei" class="report-content">
-                    <h3>紫微斗數</h3>
-                    <table class="info-table" id="p-ziwei-table"></table>
-                </div>
-                <div id="p-hd" class="report-content">
-                    <h3>人類圖</h3>
-                    <table class="info-table" id="p-hd-table"></table>
-                </div>
-                <div id="p-xingxiu" class="report-content">
-                    <h3>二十八星宿</h3>
-                    <p id="p-xingxiu-text" style="font-size:1.2em; text-align:center; padding:20px;"></p>
-                </div>
-            </div>
-        </div>
-        
-        <!-- Love Mode -->
-        <div id="love-mode" class="card hidden">
-            <h2>💕 戀愛合盤</h2>
-            <p style="margin-bottom: 20px; color: #666;">輸入兩個人的資料，看你們合不合</p>
-            
-            <form id="love-form">
-                <div class="form-row">
-                    <div style="flex: 1;">
-                        <h4 style="color: #667eea; margin-bottom: 15px;">👤 你</h4>
-                        <div class="form-group">
-                            <label>姓名</label>
-                            <input type="text" id="l-name1" placeholder="韡寧">
-                        </div>
-                        <div class="form-group">
-                            <label>生日</label>
-                            <input type="date" id="l-date1" required>
-                        </div>
-                        <div class="form-group">
-                            <label>時間</label>
-                            <input type="time" id="l-time1" value="12:00">
-                        </div>
-                        <div class="form-group">
-                            <label>性別</label>
-                            <select id="l-gender1">
-                                <option value="女">女</option>
-                                <option value="男">男</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div style="flex: 1;">
-                        <h4 style="color: #e91e63; margin-bottom: 15px;">💕 對方</h4>
-                        <div class="form-group">
-                            <label>姓名</label>
-                            <input type="text" id="l-name2" placeholder="男友">
-                        </div>
-                        <div class="form-group">
-                            <label>生日</label>
-                            <input type="date" id="l-date2" required>
-                        </div>
-                        <div class="form-group">
-                            <label>時間</label>
-                            <input type="time" id="l-time2" value="12:00">
-                        </div>
-                        <div class="form-group">
-                            <label>性別</label>
-                            <select id="l-gender2">
-                                <option value="男">男</option>
-                                <option value="女">女</option>
-                            </select>
-                        </div>
-                    </div>
-                </div>
-                <button type="submit" class="submit-btn" id="l-submit">💕 開始合盤分析</button>
-            </form>
-            
-            <div id="love-loading" class="loading hidden"></div>
+<!-- Hero -->
+<section class="relative overflow-hidden px-6 py-16 md:py-24">
+  <div class="absolute inset-0 opacity-20">
+    <div class="absolute top-0 left-1/3 w-96 h-96 bg-amber-500/10 rounded-full blur-3xl"></div>
+    <div class="absolute bottom-0 right-1/3 w-96 h-96 bg-purple-500/10 rounded-full blur-3xl"></div>
+  </div>
+  <div class="relative max-w-2xl mx-auto text-center">
+    <p class="text-amber-500/60 text-xs tracking-[0.3em] uppercase mb-4">Family Destiny</p>
+    <h1 class="serif text-4xl md:text-6xl font-black gradient-text mb-4">家庭關係翻譯師</h1>
+    <p class="text-white/50 text-lg mb-2">輸入生日，拿到自己的使用手冊 + 家庭的溝通指南</p>
+    <p class="text-white/30 text-sm">八字 · 占星 · 紫微 · 人類圖 · 星宿 — 五系統交叉驗證</p>
+  </div>
+</section>
 
-            <!-- Love Free Preview -->
-            <div id="love-preview" class="hidden">
-                <div class="score-card">
-                    <div class="score" id="l-score" style="font-size:3em;">⭐⭐⭐⭐</div>
-                    <div class="summary" style="font-size: 1.3em; margin-top: 10px;" id="l-summary">
-                        「輕鬆舒服但需要主動經營深度」
-                    </div>
-                    <p style="margin-top: 15px; opacity: 0.9;" id="l-dims">
-                        八字：金生水 ★★★★ | 占星：太陽落差 ★★★<br>
-                        紫微：雙紫府 ★★★★ | 人類圖：雙情緒 ★★★ | 星宿：友衰 ★★★★
-                    </p>
-                </div>
-                
-                <div class="paywall">
-                    <h3>🔒 解鎖完整合盤報告</h3>
-                    <p>免費版只能看到「綜合評分」和「一句話總結」</p>
-                    <p>付費版包含：五個維度詳細分析 + 衝突點解析 + 關係處方籤 + 溝通指南</p>
-                    
-                    <div class="price-options">
-                        <div class="price-option" onclick="selectPrice(this)">
-                            <div class="price">$99</div>
-                            <div class="period">單次合盤</div>
-                        </div>
-                        <div class="price-option recommended" onclick="selectPrice(this)">
-                            <div class="price">$299</div>
-                            <div class="period">月訂閱（無限合盤）</div>
-                        </div>
-                        <div class="price-option" onclick="selectPrice(this)">
-                            <div class="price">$2,990</div>
-                            <div class="period">年訂閱（省 $598）</div>
-                        </div>
-                    </div>
-                    
-                    <button class="submit-btn" style="max-width: 300px; margin: 0 auto;">
-                        💎 立即解鎖
-                    </button>
-                </div>
-            </div>
-        </div>
-        
-        <!-- Family Mode -->
-        <div id="family-mode" class="card hidden">
-            <h2>👨‍👩‍👧‍👦 家庭合盤（付費）</h2>
-            <p style="margin-bottom: 20px; color: #666;">輸入全家人的資料，生成家庭組織架構圖 + 溝通指南</p>
-            <div class="paywall">
-                <h3>💎 家庭模式需付費解鎖</h3>
-                <p>包含：組織架構圖 + 關係矩陣 + 溝通指南 + 年度報告</p>
-                <button class="submit-btn" style="max-width: 300px; margin: 20px auto 0;">
-                    了解更多方案
-                </button>
-            </div>
-        </div>
+<!-- Mode Tabs -->
+<section class="px-6 pb-8">
+  <div class="max-w-2xl mx-auto">
+    <div class="flex gap-2 p-1 rounded-2xl bg-white/5 border border-white/5">
+      <button onclick="switchMode('personal')" id="tab-personal" class="flex-1 py-3 rounded-xl text-sm font-bold transition-all tab-active">個人報告</button>
+      <button onclick="switchMode('compatibility')" id="tab-compatibility" class="flex-1 py-3 rounded-xl text-sm font-bold text-white/40 hover:text-white/70 transition-all">戀愛合盤</button>
+      <button onclick="switchMode('family')" id="tab-family" class="flex-1 py-3 rounded-xl text-sm font-bold text-white/40 hover:text-white/70 transition-all">家庭報告 💎</button>
     </div>
-    
-    <script>
-        // Mode Switching
-        function switchMode(mode) {
-            document.querySelectorAll('.mode-btn').forEach(btn => btn.classList.remove('active'));
-            event.target.classList.add('active');
-            
-            document.getElementById('personal-mode').classList.add('hidden');
-            document.getElementById('love-mode').classList.add('hidden');
-            document.getElementById('family-mode').classList.add('hidden');
-            
-            document.getElementById(mode + '-mode').classList.remove('hidden');
-        }
-        
-        // Tab Switching
-        function switchTab(tabId) {
-            document.querySelectorAll('.report-tab').forEach(tab => tab.classList.remove('active'));
-            event.target.classList.add('active');
-            
-            document.querySelectorAll('.report-content').forEach(content => content.classList.remove('active'));
-            document.getElementById(tabId).classList.add('active');
-        }
-        
-        // ---------- Personal Form ----------
-        document.getElementById('personal-form').addEventListener('submit', async function(e) {
-            e.preventDefault();
-            const btn = document.getElementById('p-submit');
-            btn.disabled = true;
-            document.getElementById('personal-report').classList.add('hidden');
-            document.getElementById('personal-loading').classList.remove('hidden');
+  </div>
+</section>
 
-            const payload = {
-                name: document.getElementById('p-name').value,
-                gender: document.getElementById('p-gender').value,
-                date: document.getElementById('p-date').value,
-                time: document.getElementById('p-time').value || '12:00',
-                location: document.getElementById('p-location').value
-            };
+<!-- Forms -->
+<section class="px-6 pb-16">
+  <div class="max-w-2xl mx-auto">
 
-            try {
-                const res = await fetch('/api/analyze', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
-                });
-                const data = await res.json();
-                renderPersonalReport(data);
-                document.getElementById('personal-report').classList.remove('hidden');
-                document.getElementById('personal-report').scrollIntoView({ behavior: 'smooth' });
-            } catch (err) {
-                alert('分析失敗：' + err.message);
-            } finally {
-                document.getElementById('personal-loading').classList.add('hidden');
-                btn.disabled = false;
-            }
-        });
+    <!-- Personal Form -->
+    <form id="form-personal" action="/report/personal" method="get" class="card-glass rounded-2xl p-6 md:p-8 space-y-4">
+      <h2 class="serif text-xl font-bold text-white/90 mb-2">生成個人五系統報告</h2>
+      <p class="text-white/40 text-sm mb-4">免費查看基礎命盤 · 付費解鎖整合畫像與生活處方籤</p>
 
-        function renderPersonalReport(d) {
-            // Score
-            document.getElementById('p-energy-score').textContent = d.energy_score || '--';
-            document.getElementById('p-summary').textContent = d.summary || '--';
-            const starCount = Math.min(5, Math.max(1, Math.round((d.energy_score || 60) / 20)));
-            document.getElementById('p-stars').textContent = '⭐'.repeat(starCount);
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <label class="text-xs text-white/40 mb-1 block">姓名</label>
+          <input name="name" type="text" placeholder="例如：韡寧" required class="w-full h-11 px-4 rounded-xl">
+        </div>
+        <div>
+          <label class="text-xs text-white/40 mb-1 block">性別</label>
+          <select name="gender" class="w-full h-11 px-4 rounded-xl">
+            <option value="女">女</option>
+            <option value="男">男</option>
+          </select>
+        </div>
+        <div>
+          <label class="text-xs text-white/40 mb-1 block">出生日期</label>
+          <input name="date" type="date" required class="w-full h-11 px-4 rounded-xl">
+        </div>
+        <div>
+          <label class="text-xs text-white/40 mb-1 block">出生時間</label>
+          <input name="time" type="time" value="12:00" required class="w-full h-11 px-4 rounded-xl">
+        </div>
+        <div class="md:col-span-2">
+          <label class="text-xs text-white/40 mb-1 block">出生地</label>
+          <select name="location" class="w-full h-11 px-4 rounded-xl">
+            <option value="taipei">台北</option>
+            <option value="taichung">台中</option>
+            <option value="kaohsiung">高雄</option>
+          </select>
+        </div>
+      </div>
 
-            // Integrated grid
-            const p = d.portrait || {};
-            document.getElementById('p-integrated-grid').innerHTML = (p.integrated_cards || []).map(c => `
-                <div class="dimension-card">
-                    <h4>${c.title}</h4>
-                    <p>${c.text}</p>
-                    <p style="color: #e74c3c; margin-top: 5px;">${c.bad}</p>
-                </div>
-            `).join('');
+      <button type="submit" class="w-full py-3.5 rounded-xl bg-amber-500/15 border border-amber-500/30 text-amber-300 font-bold hover:bg-amber-500/25 transition-all mt-2">
+        生成報告
+      </button>
+    </form>
 
-            // Life Topic
-            document.getElementById('p-life-topic').textContent = p.life_topic || '--';
+    <!-- Compatibility Form -->
+    <form id="form-compatibility" action="/report/compatibility" method="get" class="card-glass rounded-2xl p-6 md:p-8 space-y-4 hidden">
+      <h2 class="serif text-xl font-bold text-white/90 mb-2">生成雙人合盤報告</h2>
+      <p class="text-white/40 text-sm mb-4">免費查看基礎合盤 · 付費解鎖深度關係分析與溝通指南</p>
 
-            // Prescription
-            document.getElementById('p-prescription-list').innerHTML = (p.prescriptions || []).map(p => `
-                <div class="prescription-item">
-                    <span class="icon">${p.icon}</span>
-                    <div class="text">
-                        <strong>${p.title}</strong><br>
-                        ${p.desc}
-                    </div>
-                </div>
-            `).join('');
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <!-- Person 1 -->
+        <div class="space-y-3">
+          <h3 class="text-sm font-bold text-amber-400">第一人</h3>
+          <input name="name1" type="text" placeholder="姓名" required class="w-full h-11 px-4 rounded-xl">
+          <select name="gender1" class="w-full h-11 px-4 rounded-xl">
+            <option value="女">女</option>
+            <option value="男">男</option>
+          </select>
+          <input name="date1" type="date" required class="w-full h-11 px-4 rounded-xl">
+          <input name="time1" type="time" value="12:00" required class="w-full h-11 px-4 rounded-xl">
+        </div>
+        <!-- Person 2 -->
+        <div class="space-y-3">
+          <h3 class="text-sm font-bold text-rose-400">第二人</h3>
+          <input name="name2" type="text" placeholder="姓名" required class="w-full h-11 px-4 rounded-xl">
+          <select name="gender2" class="w-full h-11 px-4 rounded-xl">
+            <option value="女">女</option>
+            <option value="男">男</option>
+          </select>
+          <input name="date2" type="date" required class="w-full h-11 px-4 rounded-xl">
+          <input name="time2" type="time" value="12:00" required class="w-full h-11 px-4 rounded-xl">
+        </div>
+      </div>
 
-            // Bazi
-            const baziRows = [
-                ['年柱', bz.year || '-'], ['月柱', bz.month || '-'],
-                ['日柱', bz.day || '-'], ['時柱', bz.hour || '-'],
-                ['日主', bz.day_master || '-']
-            ];
-            document.getElementById('p-bazi-table').innerHTML = baziRows.map(r => `<tr><th>${r[0]}</th><td>${r[1]}</td></tr>`).join('');
+      <button type="submit" class="w-full py-3.5 rounded-xl bg-rose-500/15 border border-rose-500/30 text-rose-300 font-bold hover:bg-rose-500/25 transition-all mt-2">
+        生成合盤
+      </button>
+    </form>
 
-            // Astro
-            document.getElementById('p-astro-table').innerHTML = Object.entries(ast).map(([k,v]) => 
-                `<tr><th>${k}</th><td>${v.sign} ${v.degree}°</td></tr>`
-            ).join('');
+    <!-- Family Form -->
+    <form id="form-family" class="card-glass rounded-2xl p-6 md:p-8 space-y-4 hidden">
+      <h2 class="serif text-xl font-bold text-white/90 mb-2">生成家庭報告</h2>
+      <p class="text-white/40 text-sm mb-4">2-6 人家庭關係矩陣 + 溝通指南 · NT$199/次</p>
+      <div id="family-members" class="space-y-4">
+        <div class="family-member grid grid-cols-1 md:grid-cols-4 gap-3 p-4 rounded-xl bg-white/5">
+          <input name="names[]" type="text" placeholder="姓名" required class="h-11 px-4 rounded-xl">
+          <select name="genders[]" class="h-11 px-4 rounded-xl">
+            <option value="女">女</option>
+            <option value="男">男</option>
+          </select>
+          <input name="dates[]" type="date" required class="h-11 px-4 rounded-xl">
+          <input name="times[]" type="time" value="12:00" required class="h-11 px-4 rounded-xl">
+        </div>
+      </div>
+      <button type="button" onclick="addFamilyMember()" class="text-sm text-white/40 hover:text-white/70 transition-colors">+ 新增成員</button>
+      <button type="submit" class="w-full py-3.5 rounded-xl bg-purple-500/15 border border-purple-500/30 text-purple-300 font-bold hover:bg-purple-500/25 transition-all">
+        生成家庭報告
+      </button>
+    </form>
 
-            // Ziwei
-            const zwRows = [
-                ['命宮', zw['命宮'] || '-'], ['身宮', zw['身宮'] || '-'],
-                ['五行局', zw['五行局'] || '-'], ['紫微', zw['紫微'] || '-'], ['天府', zw['天府'] || '-']
-            ];
-            if (zw['主星']) {
-                zwRows.push(['主星', Object.entries(zw['主星']).map(([k,v]) => `${k}在${v}`).join('、')]);
-            }
-            if (zw['輔星']) {
-                zwRows.push(['輔星', Object.entries(zw['輔星']).map(([k,v]) => `${k}在${v}`).join('、')]);
-            }
-            if (zw['四化']) {
-                zwRows.push(['四化', Object.entries(zw['四化']).map(([k,v]) => `${k}→${v}`).join('、')]);
-            }
-            document.getElementById('p-ziwei-table').innerHTML = zwRows.map(r => `<tr><th>${r[0]}</th><td>${r[1]}</td></tr>`).join('');
+  </div>
+</section>
 
-            // HD
-            const hdRows = [
-                ['能量類型', hd.energy_type || '-'],
-                ['人生角色', hd.profile || '-'],
-                ['內在權威', hd.authority || '-'],
-                ['定義中心', (hd.defined_centers || []).join('、')],
-                ['定義閘門', (hd.defined_gates || []).map(g => `閘門${g}`).join('、')],
-                ['活躍通道', (hd.active_channels || []).map(c => `${c[0]}-${c[1]}`).join('、')]
-            ];
-            document.getElementById('p-hd-table').innerHTML = hdRows.map(r => `<tr><th>${r[0]}</th><td>${r[1]}</td></tr>`).join('');
+<!-- Pricing -->
+<section class="px-6 pb-16">
+  <div class="max-w-2xl mx-auto">
+    <div class="flex items-center gap-4 mb-8">
+      <div class="h-px flex-1 bg-white/5"></div>
+      <span class="text-xs text-white/30 tracking-[0.3em] uppercase">價格方案</span>
+      <div class="h-px flex-1 bg-white/5"></div>
+    </div>
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+      <div class="card-glass rounded-2xl p-4 text-center">
+        <p class="text-lg font-bold text-amber-300">NT$99</p>
+        <p class="text-xs text-white/40 mt-1">單次個人報告</p>
+      </div>
+      <div class="card-glass rounded-2xl p-4 text-center">
+        <p class="text-lg font-bold text-rose-300">NT$99</p>
+        <p class="text-xs text-white/40 mt-1">單次戀愛合盤</p>
+      </div>
+      <div class="card-glass rounded-2xl p-4 text-center">
+        <p class="text-lg font-bold text-purple-300">NT$199</p>
+        <p class="text-xs text-white/40 mt-1">單次家庭報告</p>
+      </div>
+      <div class="card-gold rounded-2xl p-4 text-center">
+        <p class="text-lg font-bold text-amber-300">NT$299</p>
+        <p class="text-xs text-white/40 mt-1">月訂閱無限</p>
+      </div>
+    </div>
+  </div>
+</section>
 
-            // Xingxiu
-            document.getElementById('p-xingxiu-text').innerHTML = `<strong style="font-size:2em; color:#667eea;">${d.xingxiu || '未知'}宿</strong>`;
-        }
+<footer class="px-6 py-8 text-center">
+  <p class="text-white/20 text-xs">Family Destiny · 五系統命理解讀 · 不是算命，是自我理解</p>
+</footer>
 
-        // ---------- Love Form ----------
-        document.getElementById('love-form').addEventListener('submit', async function(e) {
-            e.preventDefault();
-            const btn = document.getElementById('l-submit');
-            btn.disabled = true;
-            document.getElementById('love-preview').classList.add('hidden');
-            document.getElementById('love-loading').classList.remove('hidden');
+<script>
+function switchMode(mode) {
+  ['personal', 'compatibility', 'family'].forEach(m => {
+    document.getElementById('form-' + m).classList.add('hidden');
+    document.getElementById('tab-' + m).classList.remove('tab-active');
+    document.getElementById('tab-' + m).classList.add('text-white/40');
+  });
+  document.getElementById('form-' + mode).classList.remove('hidden');
+  document.getElementById('tab-' + mode).classList.add('tab-active');
+  document.getElementById('tab-' + mode).classList.remove('text-white/40');
+}
 
-            const payload = {
-                person1: {
-                    name: document.getElementById('l-name1').value,
-                    gender: document.getElementById('l-gender1').value,
-                    date: document.getElementById('l-date1').value,
-                    time: document.getElementById('l-time1').value || '12:00',
-                    location: 'taipei'
-                },
-                person2: {
-                    name: document.getElementById('l-name2').value,
-                    gender: document.getElementById('l-gender2').value,
-                    date: document.getElementById('l-date2').value,
-                    time: document.getElementById('l-time2').value || '12:00',
-                    location: 'taipei'
-                }
-            };
+function addFamilyMember() {
+  const container = document.getElementById('family-members');
+  const div = document.createElement('div');
+  div.className = 'family-member grid grid-cols-1 md:grid-cols-4 gap-3 p-4 rounded-xl bg-white/5';
+  div.innerHTML = `
+    <input name="names[]" type="text" placeholder="姓名" required class="h-11 px-4 rounded-xl">
+    <select name="genders[]" class="h-11 px-4 rounded-xl">
+      <option value="女">女</option>
+      <option value="男">男</option>
+    </select>
+    <input name="dates[]" type="date" required class="h-11 px-4 rounded-xl">
+    <input name="times[]" type="time" value="12:00" required class="h-11 px-4 rounded-xl">
+  `;
+  container.appendChild(div);
+}
+</script>
 
-            try {
-                const res = await fetch('/api/compatibility', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
-                });
-                const data = await res.json();
-                renderLoveReport(data);
-                document.getElementById('love-preview').classList.remove('hidden');
-                document.getElementById('love-preview').scrollIntoView({ behavior: 'smooth' });
-            } catch (err) {
-                alert('合盤分析失敗：' + err.message);
-            } finally {
-                document.getElementById('love-loading').classList.add('hidden');
-                btn.disabled = false;
-            }
-        });
-
-        function renderLoveReport(d) {
-            const stars = '⭐'.repeat(Math.min(5, Math.max(1, Math.round(d.overall_score || 3))));
-            document.getElementById('l-score').textContent = stars;
-            document.getElementById('l-summary').textContent = `「${d.summary || ''}」`;
-            const dims = d.dimensions || {};
-            document.getElementById('l-dims').innerHTML = `
-                八字：${dims.bazi?.note || ''} ${'★'.repeat(dims.bazi?.score || 0)} | 
-                占星：${dims.astro?.note || ''} ${'★'.repeat(dims.astro?.score || 0)}<br>
-                紫微：${dims.ziwei?.note || ''} ${'★'.repeat(dims.ziwei?.score || 0)} | 
-                人類圖：${dims.hd?.note || ''} ${'★'.repeat(dims.hd?.score || 0)} | 
-                星宿：${dims.xingxiu?.note || ''} ${'★'.repeat(dims.xingxiu?.score || 0)}
-            `;
-        }
-        
-        // Price Selection
-        function selectPrice(element) {
-            document.querySelectorAll('.price-option').forEach(opt => opt.style.borderColor = 'transparent');
-            element.style.borderColor = '#ff9800';
-        }
-    </script>
 </body>
 </html>

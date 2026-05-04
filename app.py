@@ -401,5 +401,82 @@ def friends_report():
     return jsonify(result)
 
 
+# ---------- report routes ----------
+
+@app.route('/report/personal')
+def report_personal():
+    """個人完整報告頁面（含付費牆）"""
+    name = request.args.get('name', '訪客')
+    date = request.args.get('date', '2000-01-01')
+    time = request.args.get('time', '12:00')
+    gender = request.args.get('gender', '女')
+    location = request.args.get('location', 'taipei')
+    
+    data = {'name': name, 'date': date, 'time': time, 'gender': gender, 'location': location}
+    result = _analyze_person(data)
+    
+    return render_template('report_personal.html',
+        name=name,
+        date=date,
+        time=time,
+        gender=gender,
+        summary=result['summary'],
+        energy_score=result['energy_score'],
+        bazi=result['bazi'],
+        astrology=result['astrology'],
+        ziwei=result['ziwei'],
+        humandesign=result['humandesign'],
+        xingxiu=result['xingxiu'],
+        portrait=result['portrait']
+    )
+
+
+@app.route('/report/compatibility')
+def report_compatibility():
+    """雙人合盤報告頁面（含付費牆）"""
+    name1 = request.args.get('name1', 'A')
+    date1 = request.args.get('date1', '2000-01-01')
+    time1 = request.args.get('time1', '12:00')
+    gender1 = request.args.get('gender1', '女')
+    
+    name2 = request.args.get('name2', 'B')
+    date2 = request.args.get('date2', '2000-01-01')
+    time2 = request.args.get('time2', '12:00')
+    gender2 = request.args.get('gender2', '女')
+    
+    p1 = _analyze_person({'name': name1, 'date': date1, 'time': time1, 'gender': gender1, 'location': 'taipei'})
+    p2 = _analyze_person({'name': name2, 'date': date2, 'time': time2, 'gender': gender2, 'location': 'taipei'})
+    
+    # Simple compatibility calc
+    wuxing = {'甲':'木','乙':'木','丙':'火','丁':'火','戊':'土','己':'土','庚':'金','辛':'金','壬':'水','癸':'水'}
+    dm1 = wuxing.get(p1['bazi']['day_master'], '')
+    dm2 = wuxing.get(p2['bazi']['day_master'], '')
+    sheng = {'木':'火','火':'土','土':'金','金':'水','水':'木'}
+    ke = {'木':'土','土':'水','水':'火','火':'金','金':'木'}
+    
+    if sheng.get(dm1) == dm2:
+        relation_type = f"{dm1}生{dm2}"
+        relation_desc = "你滋養對方，付出型關係"
+    elif ke.get(dm1) == dm2:
+        relation_type = f"{dm1}剋{dm2}"
+        relation_desc = "你制約對方，引導型關係"
+    elif sheng.get(dm2) == dm1:
+        relation_type = f"{dm2}生{dm1}"
+        relation_desc = "對方滋養你，被照顧型關係"
+    elif ke.get(dm2) == dm1:
+        relation_type = f"{dm2}剋{dm1}"
+        relation_desc = "對方制約你，被引導型關係"
+    else:
+        relation_type = "比劫"
+        relation_desc = "平起平坐，競爭與合作並存"
+    
+    return render_template('report_compatibility.html',
+        name1=name1, name2=name2,
+        p1=p1, p2=p2,
+        relation_type=relation_type,
+        relation_desc=relation_desc
+    )
+
+
 if __name__ == '__main__':
     app.run(debug=True, port=5001)
