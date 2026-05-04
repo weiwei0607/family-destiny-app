@@ -42,10 +42,10 @@ def place_ziwei(day, wuxing):
     return (pos - 1) % 12
 
 
-# ── 天府定位 ──
+# ── 天府定位（中州派）──
 def place_tianfu(ziwei_zw):
-    """紫府相對位置公式（保證永不同宮）"""
-    return (ziwei_zw * 5 + 6) % 12
+    """中州派：紫微 + 天府 ≡ 0 (mod 12)。紫府同宮於寅、申"""
+    return (-ziwei_zw) % 12
 
 
 # ── 年干系星曜 ──
