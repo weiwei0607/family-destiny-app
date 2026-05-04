@@ -164,23 +164,157 @@
       </div>
 
       <!-- 人類圖 -->
-      <div class="card-glass rounded-2xl p-6">
+      <div class="card-glass rounded-2xl p-6 overflow-hidden">
         <div class="flex items-center gap-2 mb-4">
           <span class="text-lg">🧬</span>
           <h3 class="font-bold text-white/90">人類圖</h3>
         </div>
-        <div class="space-y-2">
-          <div class="flex items-center justify-between">
-            <span class="text-sm text-white/50">能量類型</span>
-            <span class="text-sm font-bold text-amber-300">{{ humandesign.energy_type }}</span>
+
+        <!-- Animated BodyGraph -->
+        <div class="flex justify-center mb-4">
+          <svg viewBox="0 0 400 520" class="w-full max-w-[280px]" style="overflow:visible">
+            <defs>
+              <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+                <feGaussianBlur stdDeviation="4" result="blur"/>
+                <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+              </filter>
+              <linearGradient id="flowGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop offset="0%" stop-color="rgba(212,175,55,0)"/>
+                <stop offset="50%" stop-color="rgba(212,175,55,0.6)"/>
+                <stop offset="100%" stop-color="rgba(212,175,55,0)"/>
+              </linearGradient>
+            </defs>
+
+            <style>
+              .hd-line { stroke:rgba(255,255,255,0.08); stroke-width:2.5; stroke-linecap:round; }
+              .hd-line.active { stroke:url(#flowGrad); stroke-width:3; stroke-dasharray:8 12; animation:hdFlow 2s linear infinite; }
+              .hd-node { transition:all 0.6s ease; }
+              .hd-node.defined { animation:hdPulse 2.5s ease-in-out infinite; }
+              .hd-node.undefined { fill:rgba(255,255,255,0.03); stroke:rgba(255,255,255,0.1); }
+              .hd-label { font-size:11px; fill:rgba(255,255,255,0.35); text-anchor:middle; font-family:'Noto Sans TC',sans-serif; }
+              .hd-label.defined { fill:rgba(212,175,55,0.9); font-weight:700; }
+              .hd-gate { animation:hdBlink 3s ease-in-out infinite; }
+              @keyframes hdPulse {
+                0%,100% { filter:drop-shadow(0 0 3px rgba(212,175,55,0.3)); }
+                50% { filter:drop-shadow(0 0 10px rgba(212,175,55,0.7)); }
+              }
+              @keyframes hdFlow {
+                to { stroke-dashoffset:-20; }
+              }
+              @keyframes hdBlink {
+                0%,100% { opacity:0.2; }
+                50% { opacity:1; }
+              }
+              .hd-group { opacity:0; animation:hdReveal 0.6s ease forwards; }
+              {% for i in range(9) %}
+              .hd-group:nth-child({{ i+1 }}) { animation-delay:{{ 0.3 + i*0.08 }}s; }
+              {% endfor %}
+              @keyframes hdReveal {
+                from { opacity:0; transform:translateY(8px); }
+                to { opacity:1; transform:translateY(0); }
+              }
+            </style>
+
+            <!-- Connections -->
+            <g class="hd-group">
+              <!-- Head-Ajna -->
+              <line x1="200" y1="57" x2="200" y2="73" class="hd-line {% if '頭腦' in humandesign.defined_centers and '邏輯' in humandesign.defined_centers %}active{% endif %}"/>
+              <!-- Ajna-Throat -->
+              <line x1="200" y1="117" x2="200" y2="137" class="hd-line {% if '邏輯' in humandesign.defined_centers and '喉嚨' in humandesign.defined_centers %}active{% endif %}"/>
+              <!-- Throat-G -->
+              <line x1="200" y1="193" x2="200" y2="220" class="hd-line {% if '喉嚨' in humandesign.defined_centers and 'G中心' in humandesign.defined_centers %}active{% endif %}"/>
+              <!-- Throat-Heart -->
+              <line x1="172" y1="165" x2="127" y2="223" class="hd-line {% if '喉嚨' in humandesign.defined_centers and '心輪' in humandesign.defined_centers %}active{% endif %}"/>
+              <!-- Throat-SP -->
+              <line x1="228" y1="165" x2="272" y2="274" class="hd-line {% if '喉嚨' in humandesign.defined_centers and '情緒' in humandesign.defined_centers %}active{% endif %}"/>
+              <!-- G-Heart -->
+              <line x1="175" y1="245" x2="127" y2="245" class="hd-line {% if 'G中心' in humandesign.defined_centers and '心輪' in humandesign.defined_centers %}active{% endif %}"/>
+              <!-- G-Sacral -->
+              <line x1="200" y1="270" x2="200" y2="305" class="hd-line {% if 'G中心' in humandesign.defined_centers and '薦骨' in humandesign.defined_centers %}active{% endif %}"/>
+              <!-- G-SP -->
+              <line x1="225" y1="260" x2="269" y2="274" class="hd-line {% if 'G中心' in humandesign.defined_centers and '情緒' in humandesign.defined_centers %}active{% endif %}"/>
+              <!-- Heart-Spleen -->
+              <line x1="105" y1="267" x2="105" y2="313" class="hd-line {% if '心輪' in humandesign.defined_centers and '脾臟' in humandesign.defined_centers %}active{% endif %}"/>
+              <!-- Sacral-Spleen -->
+              <line x1="170" y1="335" x2="127" y2="335" class="hd-line {% if '薦骨' in humandesign.defined_centers and '脾臟' in humandesign.defined_centers %}active{% endif %}"/>
+              <!-- Sacral-SP -->
+              <line x1="228" y1="350" x2="269" y2="326" class="hd-line {% if '薦骨' in humandesign.defined_centers and '情緒' in humandesign.defined_centers %}active{% endif %}"/>
+              <!-- Sacral-Root -->
+              <line x1="200" y1="365" x2="200" y2="400" class="hd-line {% if '薦骨' in humandesign.defined_centers and '根部' in humandesign.defined_centers %}active{% endif %}"/>
+              <!-- SP-Root -->
+              <line x1="270" y1="326" x2="228" y2="400" class="hd-line {% if '情緒' in humandesign.defined_centers and '根部' in humandesign.defined_centers %}active{% endif %}"/>
+              <!-- Spleen-Root -->
+              <line x1="127" y1="357" x2="175" y2="400" class="hd-line {% if '脾臟' in humandesign.defined_centers and '根部' in humandesign.defined_centers %}active{% endif %}"/>
+            </g>
+
+            <!-- Nodes -->
+            {% set centers = [
+              {'name':'頭腦','x':200,'y':35,'r':22,'shape':'polygon'},
+              {'name':'邏輯','x':200,'y':95,'r':20,'shape':'diamond'},
+              {'name':'喉嚨','x':200,'y':165,'r':26,'shape':'square'},
+              {'name':'G中心','x':200,'y':245,'r':24,'shape':'circle'},
+              {'name':'心輪','x':105,'y':245,'r':20,'shape':'square'},
+              {'name':'情緒','x':295,'y':300,'r':24,'shape':'triangle'},
+              {'name':'薦骨','x':200,'y':335,'r':28,'shape':'square'},
+              {'name':'脾臟','x':105,'y':335,'r':20,'shape':'square'},
+              {'name':'根部','x':200,'y':425,'r':23,'shape':'square'}
+            ] %}
+
+            {% for c in centers %}
+            <g class="hd-group" style="animation-delay:{{ 0.5 + loop.index0 * 0.1 }}s">
+              {% if c.name in humandesign.defined_centers %}
+                <!-- Defined center glow -->
+                <circle cx="{{ c.x }}" cy="{{ c.y }}" r="{{ c.r + 6 }}" fill="rgba(212,175,55,0.08)" class="hd-node defined">
+                  <animate attributeName="r" values="{{ c.r+4 }};{{ c.r+10 }};{{ c.r+4 }}" dur="2.5s" repeatCount="indefinite"/>
+                  <animate attributeName="opacity" values="0.6;0.2;0.6" dur="2.5s" repeatCount="indefinite"/>
+                </circle>
+                <!-- Main shape -->
+                {% if c.shape == 'polygon' %}
+                  <polygon points="200,15 218,50 182,50" fill="rgba(212,175,55,0.15)" stroke="rgba(212,175,55,0.5)" stroke-width="1.5" class="hd-node defined"/>
+                {% elif c.shape == 'diamond' %}
+                  <polygon points="200,79 216,95 200,111 184,95" fill="rgba(212,175,55,0.15)" stroke="rgba(212,175,55,0.5)" stroke-width="1.5" class="hd-node defined"/>
+                {% elif c.shape == 'triangle' %}
+                  <polygon points="295,280 312,315 278,315" fill="rgba(212,175,55,0.15)" stroke="rgba(212,175,55,0.5)" stroke-width="1.5" class="hd-node defined"/>
+                {% else %}
+                  <rect x="{{ c.x - c.r }}" y="{{ c.y - c.r }}" width="{{ c.r*2 }}" height="{{ c.r*2 }}" rx="4" fill="rgba(212,175,55,0.15)" stroke="rgba(212,175,55,0.5)" stroke-width="1.5" class="hd-node defined"/>
+                {% endif %}
+                <text x="{{ c.x }}" y="{{ c.y + 4 }}" class="hd-label defined">{{ c.name }}</text>
+              {% else %}
+                <!-- Undefined center -->
+                {% if c.shape == 'polygon' %}
+                  <polygon points="200,15 218,50 182,50" fill="none" stroke="rgba(255,255,255,0.12)" stroke-width="1.5" stroke-dasharray="3 3" class="hd-node undefined"/>
+                {% elif c.shape == 'diamond' %}
+                  <polygon points="200,79 216,95 200,111 184,95" fill="none" stroke="rgba(255,255,255,0.12)" stroke-width="1.5" stroke-dasharray="3 3" class="hd-node undefined"/>
+                {% elif c.shape == 'triangle' %}
+                  <polygon points="295,280 312,315 278,315" fill="none" stroke="rgba(255,255,255,0.12)" stroke-width="1.5" stroke-dasharray="3 3" class="hd-node undefined"/>
+                {% else %}
+                  <rect x="{{ c.x - c.r }}" y="{{ c.y - c.r }}" width="{{ c.r*2 }}" height="{{ c.r*2 }}" rx="4" fill="none" stroke="rgba(255,255,255,0.12)" stroke-width="1.5" stroke-dasharray="3 3" class="hd-node undefined"/>
+                {% endif %}
+                <text x="{{ c.x }}" y="{{ c.y + 4 }}" class="hd-label">{{ c.name }}</text>
+              {% endif %}
+            </g>
+            {% endfor %}
+
+            <!-- Defined gates sparkles -->
+            {% for gate in humandesign.defined_gates %}
+            <circle cx="{{ 140 + (gate % 8) * 25 }}" cy="{{ 460 + (gate // 8) * 12 }}" r="2.5" fill="#d4af37" class="hd-gate" style="animation-delay:{{ gate * 0.15 }}s"/>
+            {% endfor %}
+          </svg>
+        </div>
+
+        <!-- Data pills -->
+        <div class="grid grid-cols-3 gap-2 text-center">
+          <div class="rounded-xl bg-amber-500/10 border border-amber-500/20 p-2 hd-data" style="opacity:0;animation:hdReveal 0.5s ease 1.2s forwards">
+            <p class="text-[10px] text-white/40 mb-0.5">能量類型</p>
+            <p class="text-xs font-bold text-amber-300">{{ humandesign.energy_type }}</p>
           </div>
-          <div class="flex items-center justify-between">
-            <span class="text-sm text-white/50">人生角色</span>
-            <span class="text-sm font-bold text-white/80">{{ humandesign.profile }}</span>
+          <div class="rounded-xl bg-white/5 border border-white/10 p-2 hd-data" style="opacity:0;animation:hdReveal 0.5s ease 1.4s forwards">
+            <p class="text-[10px] text-white/40 mb-0.5">人生角色</p>
+            <p class="text-xs font-bold text-white/80">{{ humandesign.profile }}</p>
           </div>
-          <div class="flex items-center justify-between">
-            <span class="text-sm text-white/50">內在權威</span>
-            <span class="text-sm font-bold text-white/80">{{ humandesign.authority }}</span>
+          <div class="rounded-xl bg-white/5 border border-white/10 p-2 hd-data" style="opacity:0;animation:hdReveal 0.5s ease 1.6s forwards">
+            <p class="text-[10px] text-white/40 mb-0.5">內在權威</p>
+            <p class="text-xs font-bold text-white/80">{{ humandesign.authority }}</p>
           </div>
         </div>
       </div>
