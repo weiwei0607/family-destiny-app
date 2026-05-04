@@ -91,12 +91,10 @@ def calculate(planets_longitudes):
     has_sacral = '薦骨' in defined_centers
     has_throat = '喉嚨' in defined_centers
     has_motor = bool(defined_centers & {'情緒', '意志力', '根'})
-    # 薦骨也算 motor，但上面已經分開判斷
-    motor_to_throat = has_motor and has_throat
-    sacral_to_throat = has_sacral and has_throat
 
     if has_sacral:
-        if sacral_to_throat or (has_motor and motor_to_throat):
+        # 顯示生產者 = 薦骨 + 有動力中心定義（情緒/意志力/根）
+        if has_motor:
             energy_type = "顯示生產者"
         else:
             energy_type = "生產者"
