@@ -109,100 +109,116 @@ def index():
 @app.route('/api/analyze', methods=['POST'])
 def analyze():
     """個人分析 API（免費）"""
-    data = request.get_json()
-    result = _analyze_person(data)
-    return jsonify(result)
+    try:
+        data = request.get_json()
+        if not data:
+            return jsonify({"error": "無效的請求格式"}), 400
+        result = _analyze_person(data)
+        return jsonify(result)
+    except (ValueError, KeyError) as e:
+        return jsonify({"error": f"參數錯誤：{str(e)}"}), 400
+    except Exception:
+        return jsonify({"error": "分析失敗，請稍後再試"}), 500
 
 @app.route('/api/compatibility', methods=['POST'])
 def compatibility():
     """合盤分析 API（免費預覽 + 付費牆提示由前端控制）"""
-    data = request.get_json()
-    p1_data = data.get('person1', {})
-    p2_data = data.get('person2', {})
+    try:
+        data = request.get_json()
+        if not data:
+            return jsonify({"error": "無效的請求格式"}), 400
+        p1_data = data.get('person1', {})
+        p2_data = data.get('person2', {})
+        if not p1_data or not p2_data:
+            return jsonify({"error": "缺少 person1 或 person2 資料"}), 400
 
-    # 真正計算兩個人
-    p1 = _analyze_person(p1_data)
-    p2 = _analyze_person(p2_data)
+        # 真正計算兩個人
+        p1 = _analyze_person(p1_data)
+        p2 = _analyze_person(p2_data)
 
-    # 八字合盤（日主生剋）
-    wuxing = {'甲':'木','乙':'木','丙':'火','丁':'火','戊':'土','己':'土','庚':'金','辛':'金','壬':'水','癸':'水'}
-    sheng = {'木':'火','火':'土','土':'金','金':'水','水':'木'}
-    ke = {'木':'土','土':'水','水':'火','火':'金','金':'木'}
-    dm1 = wuxing.get(p1['bazi']['day_master'], '')
-    dm2 = wuxing.get(p2['bazi']['day_master'], '')
-    if sheng.get(dm1) == dm2:
-        bazi_note = f"{dm1}生{dm2} · 你滋養對方"
-        bazi_score = 4
-    elif ke.get(dm1) == dm2:
-        bazi_note = f"{dm1}剋{dm2} · 你制約對方"
-        bazi_score = 3
-    elif sheng.get(dm2) == dm1:
-        bazi_note = f"{dm2}生{dm1} · 對方滋養你"
-        bazi_score = 4
-    elif ke.get(dm2) == dm1:
-        bazi_note = f"{dm2}剋{dm1} · 對方制約你"
-        bazi_score = 3
-    else:
-        bazi_note = f"{dm1}與{dm2}比劫 · 平起平坐"
-        bazi_score = 3
+        # 八字合盤（日主生剋）
+        wuxing = {'甲':'木','乙':'木','丙':'火','丁':'火','戊':'土','己':'土','庚':'金','辛':'金','壬':'水','癸':'水'}
+        sheng = {'木':'火','火':'土','土':'金','金':'水','水':'木'}
+        ke = {'木':'土','土':'水','水':'火','火':'金','金':'木'}
+        dm1 = wuxing.get(p1['bazi']['day_master'], '')
+        dm2 = wuxing.get(p2['bazi']['day_master'], '')
+        if sheng.get(dm1) == dm2:
+            bazi_note = f"{dm1}生{dm2} · 你滋養對方"
+            bazi_score = 4
+        elif ke.get(dm1) == dm2:
+            bazi_note = f"{dm1}剋{dm2} · 你制約對方"
+            bazi_score = 3
+        elif sheng.get(dm2) == dm1:
+            bazi_note = f"{dm2}生{dm1} · 對方滋養你"
+            bazi_score = 4
+        elif ke.get(dm2) == dm1:
+            bazi_note = f"{dm2}剋{dm1} · 對方制約你"
+            bazi_score = 3
+        else:
+            bazi_note = f"{dm1}與{dm2}比劫 · 平起平坐"
+            bazi_score = 3
 
-    # 占星合盤（太陽星座落差）
-    sun1 = p1['astrology'].get('太陽', {}).get('sign', '')
-    sun2 = p2['astrology'].get('太陽', {}).get('sign', '')
-    if sun1 == sun2:
-        astro_note = f"同{sun1} · 節奏同步"
-        astro_score = 5
-    else:
-        astro_note = f"{sun1}與{sun2} · 互補視角"
-        astro_score = 3
+        # 占星合盤（太陽星座落差）
+        sun1 = p1['astrology'].get('太陽', {}).get('sign', '')
+        sun2 = p2['astrology'].get('太陽', {}).get('sign', '')
+        if sun1 == sun2:
+            astro_note = f"同{sun1} · 節奏同步"
+            astro_score = 5
+        else:
+            astro_note = f"{sun1}與{sun2} · 互補視角"
+            astro_score = 3
 
-    # 紫微合盤
-    zw1 = p1['ziwei'].get('命宮', '未知')
-    zw2 = p2['ziwei'].get('命宮', '未知')
-    ziwei_note = f"{zw1}與{zw2} · 雙紫府格"
-    ziwei_score = 4
+        # 紫微合盤
+        zw1 = p1['ziwei'].get('命宮', '未知')
+        zw2 = p2['ziwei'].get('命宮', '未知')
+        ziwei_note = f"{zw1}與{zw2} · 雙紫府格"
+        ziwei_score = 4
 
-    # 人類圖合盤
-    hd1 = p1['humandesign'].get('energy_type', '')
-    hd2 = p2['humandesign'].get('energy_type', '')
-    if hd1 == hd2:
-        hd_note = f"雙{hd1} · 容易共振"
-        hd_score = 3
-    else:
-        hd_note = f"{hd1}與{hd2} · 互補能量"
-        hd_score = 4
+        # 人類圖合盤
+        hd1 = p1['humandesign'].get('energy_type', '')
+        hd2 = p2['humandesign'].get('energy_type', '')
+        if hd1 == hd2:
+            hd_note = f"雙{hd1} · 容易共振"
+            hd_score = 3
+        else:
+            hd_note = f"{hd1}與{hd2} · 互補能量"
+            hd_score = 4
 
-    # 星宿關係
-    xx_rel = xingxiu.relation(p1['xingxiu'], p2['xingxiu'])
-    xingxiu_note = f"{p1['xingxiu']}與{p2['xingxiu']} · {xx_rel}"
-    xingxiu_score = 4 if xx_rel in ['命之星','榮親','友衰'] else 3
+        # 星宿關係
+        xx_rel = xingxiu.relation(p1['xingxiu'], p2['xingxiu'])
+        xingxiu_note = f"{p1['xingxiu']}與{p2['xingxiu']} · {xx_rel}"
+        xingxiu_score = 4 if xx_rel in ['命之星','榮親','友衰'] else 3
 
-    # 總分
-    total = (bazi_score + astro_score + ziwei_score + hd_score + xingxiu_score) / 5
-    stars = '⭐' * round(total)
-    if total >= 4.5:
-        summary = "靈魂伴侶等級，珍惜彼此"
-    elif total >= 4:
-        summary = "輕鬆舒服，需要主動經營深度"
-    elif total >= 3:
-        summary = "有摩擦也有成長，磨合後更穩"
-    else:
-        summary = "差異較大，需要更多理解與包容"
+        # 總分
+        total = (bazi_score + astro_score + ziwei_score + hd_score + xingxiu_score) / 5
+        stars = '⭐' * round(total)
+        if total >= 4.5:
+            summary = "靈魂伴侶等級，珍惜彼此"
+        elif total >= 4:
+            summary = "輕鬆舒服，需要主動經營深度"
+        elif total >= 3:
+            summary = "有摩擦也有成長，磨合後更穩"
+        else:
+            summary = "差異較大，需要更多理解與包容"
 
-    return jsonify({
-        "overall_score": round(total, 1),
-        "stars": stars,
-        "summary": summary,
-        "dimensions": {
-            "bazi": {"score": bazi_score, "note": bazi_note},
-            "astro": {"score": astro_score, "note": astro_note},
-            "ziwei": {"score": ziwei_score, "note": ziwei_note},
-            "hd": {"score": hd_score, "note": hd_note},
-            "xingxiu": {"score": xingxiu_score, "note": xingxiu_note}
-        },
-        "person1_summary": p1['summary'],
-        "person2_summary": p2['summary']
-    })
+        return jsonify({
+            "overall_score": round(total, 1),
+            "stars": stars,
+            "summary": summary,
+            "dimensions": {
+                "bazi": {"score": bazi_score, "note": bazi_note},
+                "astro": {"score": astro_score, "note": astro_note},
+                "ziwei": {"score": ziwei_score, "note": ziwei_note},
+                "hd": {"score": hd_score, "note": hd_note},
+                "xingxiu": {"score": xingxiu_score, "note": xingxiu_note}
+            },
+            "person1_summary": p1['summary'],
+            "person2_summary": p2['summary']
+        })
+    except (ValueError, KeyError) as e:
+        return jsonify({"error": f"參數錯誤：{str(e)}"}), 400
+    except Exception:
+        return jsonify({"error": "合盤分析失敗，請稍後再試"}), 500
 
 
 # ---------- family & friends report generators ----------
@@ -361,46 +377,38 @@ def _generate_friends_report(friends_data):
 
 @app.route('/api/family-report', methods=['POST'])
 def family_report():
-    """家庭報告 API（3-6人）
-    
-    Payload:
-    {
-        "members": [
-            {"name": "韡寧", "date": "1999-06-07", "time": "15:30", "gender": "女", "location": "taipei", "role": "self"},
-            {"name": "妹妹", "date": "2002-05-06", "time": "13:15", "gender": "女", "location": "taipei", "role": "sister"},
-            ...
-        ]
-    }
-    """
-    data = request.get_json()
-    members = data.get('members', [])
-    if len(members) < 2 or len(members) > 6:
-        return jsonify({"error": "家庭成員數量需在 2-6 人之間"}), 400
-    
-    result = _generate_family_report(members)
-    return jsonify(result)
+    """家庭報告 API（3-6人）"""
+    try:
+        data = request.get_json()
+        if not data:
+            return jsonify({"error": "無效的請求格式"}), 400
+        members = data.get('members', [])
+        if len(members) < 2 or len(members) > 6:
+            return jsonify({"error": "家庭成員數量需在 2-6 人之間"}), 400
+        result = _generate_family_report(members)
+        return jsonify(result)
+    except (ValueError, KeyError) as e:
+        return jsonify({"error": f"參數錯誤：{str(e)}"}), 400
+    except Exception:
+        return jsonify({"error": "家庭報告生成失敗，請稍後再試"}), 500
 
 
 @app.route('/api/friends-report', methods=['POST'])
 def friends_report():
-    """閨蜜報告 API（2-3人）
-    
-    Payload:
-    {
-        "friends": [
-            {"name": "韡寧", "date": "1999-06-07", "time": "15:30", "gender": "女", "location": "taipei"},
-            {"name": "朋友A", "date": "1999-01-04", "time": "00:08", "gender": "女", "location": "taipei"},
-            {"name": "朋友B", "date": "1999-04-25", "time": "00:00", "gender": "女", "location": "taipei"}
-        ]
-    }
-    """
-    data = request.get_json()
-    friends = data.get('friends', [])
-    if len(friends) < 2 or len(friends) > 3:
-        return jsonify({"error": "閨蜜人數需在 2-3 人之間"}), 400
-    
-    result = _generate_friends_report(friends)
-    return jsonify(result)
+    """閨蜜報告 API（2-3人）"""
+    try:
+        data = request.get_json()
+        if not data:
+            return jsonify({"error": "無效的請求格式"}), 400
+        friends = data.get('friends', [])
+        if len(friends) < 2 or len(friends) > 3:
+            return jsonify({"error": "閨蜜人數需在 2-3 人之間"}), 400
+        result = _generate_friends_report(friends)
+        return jsonify(result)
+    except (ValueError, KeyError) as e:
+        return jsonify({"error": f"參數錯誤：{str(e)}"}), 400
+    except Exception:
+        return jsonify({"error": "閨蜜報告生成失敗，請稍後再試"}), 500
 
 
 # ---------- report routes ----------
@@ -414,8 +422,13 @@ def report_personal():
     gender = request.args.get('gender', '女')
     location = request.args.get('location', 'taipei')
     
-    data = {'name': name, 'date': date, 'time': time, 'gender': gender, 'location': location}
-    result = _analyze_person(data)
+    try:
+        data = {'name': name, 'date': date, 'time': time, 'gender': gender, 'location': location}
+        result = _analyze_person(data)
+    except (ValueError, KeyError):
+        return "日期或時間格式無效，請重新輸入", 400
+    except Exception:
+        return "報告生成失敗，請稍後再試", 500
     
     return render_template('report_personal.html',
         name=name,
@@ -446,8 +459,13 @@ def report_compatibility():
     time2 = request.args.get('time2', '12:00')
     gender2 = request.args.get('gender2', '女')
     
-    p1 = _analyze_person({'name': name1, 'date': date1, 'time': time1, 'gender': gender1, 'location': 'taipei'})
-    p2 = _analyze_person({'name': name2, 'date': date2, 'time': time2, 'gender': gender2, 'location': 'taipei'})
+    try:
+        p1 = _analyze_person({'name': name1, 'date': date1, 'time': time1, 'gender': gender1, 'location': 'taipei'})
+        p2 = _analyze_person({'name': name2, 'date': date2, 'time': time2, 'gender': gender2, 'location': 'taipei'})
+    except (ValueError, KeyError):
+        return "日期或時間格式無效，請重新輸入", 400
+    except Exception:
+        return "報告生成失敗，請稍後再試", 500
     
     # Simple compatibility calc
     wuxing = {'甲':'木','乙':'木','丙':'火','丁':'火','戊':'土','己':'土','庚':'金','辛':'金','壬':'水','癸':'水'}
@@ -507,7 +525,13 @@ def report_family():
             'location': 'taipei'
         })
     
-    result = _generate_family_report(members_data)
+    try:
+        result = _generate_family_report(members_data)
+    except (ValueError, KeyError):
+        return "日期或時間格式無效，請重新輸入", 400
+    except Exception:
+        return "報告生成失敗，請稍後再試", 500
+    
     return render_template('report_family.html',
         members=result['members'],
         matrix=result['relationship_matrix'],
