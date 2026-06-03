@@ -15,8 +15,6 @@ class _PersonalScreenState extends State<PersonalScreen> {
   DateTime? _birthDate;
   TimeOfDay _birthTime = const TimeOfDay(hour: 12, minute: 0);
   String _location = 'taipei';
-  // bool _loading = false;
-
   Future<void> _pickDate() async {
     final picked = await showDatePicker(
       context: context,
@@ -36,6 +34,7 @@ class _PersonalScreenState extends State<PersonalScreen> {
   }
 
   void _submit() {
+    if (!(_formKey.currentState?.validate() ?? false)) return;
     if (_birthDate == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('請選擇出生日期')),
@@ -87,10 +86,11 @@ class _PersonalScreenState extends State<PersonalScreen> {
                   hintText: '例如：韡寧',
                   border: OutlineInputBorder(),
                 ),
+                validator: (v) => (v == null || v.trim().isEmpty) ? '請輸入姓名或暱稱' : null,
               ),
               const SizedBox(height: 16),
               DropdownButtonFormField<String>(
-                value: _gender,
+                initialValue: _gender,
                 decoration: const InputDecoration(
                   labelText: '性別',
                   border: OutlineInputBorder(),
@@ -131,7 +131,7 @@ class _PersonalScreenState extends State<PersonalScreen> {
               ),
               const SizedBox(height: 16),
               DropdownButtonFormField<String>(
-                value: _location,
+                initialValue: _location,
                 decoration: const InputDecoration(
                   labelText: '出生地點',
                   border: OutlineInputBorder(),

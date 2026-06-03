@@ -155,6 +155,297 @@ SIHUA = {
 }
 
 
+PALACE_NAMES = [
+    '命宮', '兄弟宮', '夫妻宮', '子女宮', '財帛宮', '疾厄宮',
+    '遷移宮', '奴僕宮', '官祿宮', '田宅宮', '福德宮', '父母宮',
+]
+
+PALACE_THEMES = {
+    '命宮':  '自我認同、人生底色、個性展現',
+    '兄弟宮': '手足、同儕、短期合作',
+    '夫妻宮': '親密關係、婚姻、對待方式',
+    '子女宮': '創意、子嗣、下屬、晚輩',
+    '財帛宮': '金錢觀、財運、收入模式',
+    '疾厄宮': '身體健康、心理壓力、潛在課題',
+    '遷移宮': '出行、移居、外在機遇',
+    '奴僕宮': '朋友、部屬、人際資源',
+    '官祿宮': '事業、職涯、社會地位',
+    '田宅宮': '家庭環境、不動產、根基',
+    '福德宮': '精神享受、興趣、內在福氣',
+    '父母宮': '長輩、文書、原生家庭影響',
+}
+
+
+def get_current_daxian(chart, birth_year, gender, current_year=2026):
+    """計算當前大限宮位（現在活在哪個宮）"""
+    # 從五行局字串取出局數，如「土5局」→ 5
+    wuxing_str = chart.get('五行局', '土5局')
+    ju_num = next((int(c) for c in wuxing_str if c.isdigit()), 3)
+
+    direction = chart.get('大限走向', '順')
+    xusui = current_year - birth_year + 1  # 虛歲
+
+    # 第幾個大限（0-indexed：第0個 = 命宮大限）
+    daxian_idx = 0 if xusui < ju_num else (xusui - ju_num) // 10
+
+    ming_str = chart.get('命宮', '甲寅')
+    ming_zhi = ming_str[-1]
+    ming_idx = ZW_P.index(ming_zhi) if ming_zhi in ZW_P else 0
+
+    # 大限宮地支（順行=增 index，逆行=減 index）
+    if direction == '順':
+        daxian_idx_zw = (ming_idx + daxian_idx) % 12
+    else:
+        daxian_idx_zw = (ming_idx - daxian_idx) % 12
+    daxian_zhi = ZW_P[daxian_idx_zw]
+
+    # 宮名：依逆時針距命宮的位移（傳統 12 宮逆排）
+    palace_offset = (ming_idx - daxian_idx_zw) % 12
+    palace_name = PALACE_NAMES[palace_offset]
+    theme = PALACE_THEMES.get(palace_name, '')
+
+    # 宮中主星 + 輔星
+    stars_in_palace = []
+    for star, zhi in chart.get('主星', {}).items():
+        if zhi == daxian_zhi:
+            stars_in_palace.append(star)
+    for star, zhi in chart.get('輔星', {}).items():
+        if zhi == daxian_zhi:
+            stars_in_palace.append(star)
+
+    start_age = ju_num + daxian_idx * 10
+    end_age   = start_age + 9
+
+    return {
+        'palace_zhi':  daxian_zhi,
+        'palace_name': palace_name,
+        'theme':       theme,
+        'stars':       stars_in_palace,
+        'age_range':   f"{start_age}~{end_age}歲",
+        'start_age':   start_age,
+    }
+
+
+_LIUNIAN_HUA_EFFECT = {
+    '祿': '資源暢通，逢凶化吉，{palace}事務今年順遂豐盛',
+    '權': '能量爆發，掌握主導，{palace}今年主動有力',
+    '科': '智慧提升，貴人相助，{palace}帶來聲譽與名望',
+    '忌': '需謹慎留意，{palace}今年易有阻礙、糾紛或執著',
+}
+
+_PALACE_TOPIC = {
+    '命宮':'自我狀態與外在形象','兄弟宮':'手足同事關係','夫妻宮':'親密關係與婚姻',
+    '子女宮':'子女創意下屬','財帛宮':'金錢收入財運','疾厄宮':'身體健康壓力',
+    '遷移宮':'外出移動機遇','奴僕宮':'人際朋友資源','官祿宮':'事業職涯發展',
+    '田宅宮':'居家環境根基','福德宮':'精神享受內在','父母宮':'長輩文書文件',
+}
+
+
+def _palace_gan_from_chart(chart, palace_zhi):
+    """從命宮干支推算任意宮位天干（不需傳入出生年干）"""
+    ming_str = chart.get('命宮', '')
+    if len(ming_str) < 2:
+        return ''
+    ming_gan, ming_zhi = ming_str[0], ming_str[1]
+    if ming_gan not in GAN or ming_zhi not in ZW_P:
+        return ''
+    start_idx = (GAN.index(ming_gan) - ZW_P.index(ming_zhi)) % 10
+    p_idx = ZW_P.index(palace_zhi) if palace_zhi in ZW_P else 0
+    return GAN[(start_idx + p_idx) % 10]
+
+
+def get_daxian_sihua(chart, daxian_info):
+    """大限宮天干四化——告訴你這10年哪個宮位特別活躍"""
+    daxian_zhi = daxian_info.get('palace_zhi', '')
+    if not daxian_zhi:
+        return {}
+
+    daxian_gan = _palace_gan_from_chart(chart, daxian_zhi)
+    if not daxian_gan:
+        return {}
+
+    sihua = SIHUA.get(daxian_gan, {})
+    ming_str = chart.get('命宮', '')
+    ming_zhi = ming_str[-1] if ming_str else ''
+    ming_idx = ZW_P.index(ming_zhi) if ming_zhi in ZW_P else 0
+
+    all_stars = {**chart.get('主星', {}), **chart.get('輔星', {})}
+    result = {'daxian_gan': daxian_gan, 'sihua': {}}
+
+    for hua_type in ('祿', '權', '科', '忌'):
+        star_name = sihua.get(hua_type, '')
+        if not star_name:
+            continue
+        palace_zhi = all_stars.get(star_name)
+        if not palace_zhi:
+            result['sihua'][hua_type] = {
+                'star': star_name, 'palace': '未入盤',
+                'desc': f"大限{daxian_gan}干：{star_name}化{hua_type}（輔星）",
+            }
+            continue
+        p_idx = ZW_P.index(palace_zhi) if palace_zhi in ZW_P else 0
+        offset = (ming_idx - p_idx) % 12
+        palace_name = PALACE_NAMES[offset]
+        topic = _PALACE_TOPIC.get(palace_name, '')
+        effect = _LIUNIAN_HUA_EFFECT.get(hua_type, '').format(palace=palace_name)
+        result['sihua'][hua_type] = {
+            'star':    star_name,
+            'palace':  palace_name,
+            'palace_zhi': palace_zhi,
+            'desc':    f"大限{daxian_gan}干：{star_name}化{hua_type}→{palace_name}（{topic}）",
+        }
+
+    return result
+
+
+def get_liunian_sihua(chart, liunian_gan):
+    """流年天干觸發四化，分析各宮今年影響"""
+    sihua = SIHUA.get(liunian_gan, {})
+    if not sihua:
+        return {}
+
+    ming_str = chart.get('命宮', '')
+    ming_zhi = ming_str[-1] if ming_str else ''
+    ming_idx = ZW_P.index(ming_zhi) if ming_zhi in ZW_P else 0
+
+    all_stars = {**chart.get('主星', {}), **chart.get('輔星', {})}
+    result = {}
+    for hua_type in ('祿', '權', '科', '忌'):
+        star_name = sihua.get(hua_type, '')
+        if not star_name:
+            continue
+        palace_zhi = all_stars.get(star_name)
+        if not palace_zhi:
+            result[hua_type] = {
+                'star': star_name, 'palace': '未入盤',
+                'desc': f"{star_name}化{hua_type}（輔星未納入定位）",
+            }
+            continue
+        p_idx = ZW_P.index(palace_zhi) if palace_zhi in ZW_P else 0
+        offset = (ming_idx - p_idx) % 12
+        palace_name = PALACE_NAMES[offset]
+        topic = _PALACE_TOPIC.get(palace_name, '')
+        effect = _LIUNIAN_HUA_EFFECT.get(hua_type, '').format(palace=palace_name)
+        result[hua_type] = {
+            'star':        star_name,
+            'palace':      palace_name,
+            'palace_zhi':  palace_zhi,
+            'desc':        f"【{star_name}化{hua_type}→{palace_name}】{effect}（{topic}）",
+        }
+    return result
+
+
+def get_current_xiaoxian(chart, birth_year, gender, current_year=2026):
+    """計算當前小限宮位（每年一宮）
+    男命從寅起逆行（寅→丑→子→亥...），女命從申起順行（申→酉→戌→亥...）
+    """
+    xusui = current_year - birth_year + 1
+
+    yin_start  = ZW_P.index('寅')  # 0
+    shen_start = ZW_P.index('申')  # 6
+
+    if gender == '男':
+        idx = (yin_start - (xusui - 1)) % 12
+    else:
+        idx = (shen_start + (xusui - 1)) % 12
+
+    xiaoxian_zhi = ZW_P[idx]
+
+    ming_str = chart.get('命宮', '')
+    ming_zhi = ming_str[-1] if ming_str else ''
+    ming_idx = ZW_P.index(ming_zhi) if ming_zhi in ZW_P else 0
+
+    palace_offset = (ming_idx - idx) % 12
+    palace_name = PALACE_NAMES[palace_offset]
+    theme = PALACE_THEMES.get(palace_name, '')
+
+    stars_in_palace = []
+    for star, zhi in chart.get('主星', {}).items():
+        if zhi == xiaoxian_zhi:
+            stars_in_palace.append(star)
+    for star, zhi in chart.get('輔星', {}).items():
+        if zhi == xiaoxian_zhi:
+            stars_in_palace.append(star)
+
+    star_str = '·'.join(stars_in_palace) if stars_in_palace else '空宮'
+    return {
+        'palace_zhi':  xiaoxian_zhi,
+        'palace_name': palace_name,
+        'theme':       theme,
+        'stars':       stars_in_palace,
+        'age':         xusui,
+        'desc': (f"小限流年（{current_year}，{xusui}歲）走{palace_name}（{xiaoxian_zhi}）："
+                 f"{theme}，宮中：{star_str}"),
+    }
+
+
+def get_sihua_palace_map(chart, liunian_sihua=None, daxian_sihua=None):
+    """三層四化整合：本命+大限+流年四化投影到12宮地圖
+
+    Returns dict[palace_name] = {layers, intensity, has_ji, has_lu, summary}
+    intensity≥2 的宮位是今年最活躍、最需要關注的。
+    """
+    palace_layers = {name: [] for name in PALACE_NAMES}
+    all_stars = {**chart.get('主星', {}), **chart.get('輔星', {})}
+    ming_str  = chart.get('命宮', '')
+    ming_zhi  = ming_str[-1] if ming_str else ''
+    ming_idx  = ZW_P.index(ming_zhi) if ming_zhi in ZW_P else 0
+
+    # ① 本命四化（出生年干）
+    born_sihua = chart.get('四化', {})
+    for hua_type in ('祿', '權', '科', '忌'):
+        star_name = born_sihua.get(hua_type, '')
+        if not star_name:
+            continue
+        palace_zhi = all_stars.get(star_name)
+        if not palace_zhi or palace_zhi not in ZW_P:
+            continue
+        offset = (ming_idx - ZW_P.index(palace_zhi)) % 12
+        palace_layers[PALACE_NAMES[offset]].append(f"本命{hua_type}（{star_name}）")
+
+    # ② 大限四化
+    if daxian_sihua:
+        for hua_type, info in daxian_sihua.get('sihua', {}).items():
+            pname = info.get('palace', '')
+            if pname in palace_layers:
+                palace_layers[pname].append(f"大限{hua_type}（{info.get('star','')}）")
+
+    # ③ 流年四化
+    if liunian_sihua:
+        for hua_type, info in liunian_sihua.items():
+            pname = info.get('palace', '')
+            if pname in palace_layers:
+                palace_layers[pname].append(f"流年{hua_type}（{info.get('star','')}）")
+
+    result = {}
+    for palace_name, layers in palace_layers.items():
+        if not layers:
+            continue
+        has_ji = any('忌' in l for l in layers)
+        has_lu = any('祿' in l for l in layers)
+        intensity = len(layers)
+        if intensity >= 2:
+            if has_ji and has_lu:
+                summary = '祿忌交戰，此宮今年變動最大'
+            elif has_ji:
+                summary = '多層化忌匯聚，謹慎應對此宮課題'
+            elif has_lu:
+                summary = '多層化祿加持，此宮今年最順遂'
+            else:
+                summary = '多層四化加持，此宮今年最活躍'
+        else:
+            summary = layers[0]
+        result[palace_name] = {
+            'layers':    layers,
+            'intensity': intensity,
+            'has_ji':    has_ji,
+            'has_lu':    has_lu,
+            'summary':   summary,
+        }
+
+    return dict(sorted(result.items(), key=lambda x: x[1]['intensity'], reverse=True))
+
+
 # ── 主入口 ──
 def ziwei_chart(year_gan, year_zhi, lunar_month, lunar_day, hour_idx, gender):
     ming_p, shen_p = get_ming_shen(lunar_month, hour_idx)

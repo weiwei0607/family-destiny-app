@@ -83,6 +83,7 @@ class _FamilyScreenState extends State<FamilyScreen> {
       });
     } catch (e) {
       setState(() => _loading = false);
+      if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('生成失敗: $e')),
       );

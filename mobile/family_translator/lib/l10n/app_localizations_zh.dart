@@ -160,6 +160,12 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get notFortuneTelling => '不是算命，是「自我理解 + 關係翻譯」';
+
+  @override
+  String get annualMode => '📅 年度運勢';
+
+  @override
+  String get annualModeSubtitle => '查看這一年的運勢走向與每月重點';
 }
 
 /// The translations for Chinese, as used in China (`zh_CN`).
@@ -318,6 +324,12 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
 
   @override
   String get notFortuneTelling => '不是算命，是「自我理解 + 关系翻译」';
+
+  @override
+  String get annualMode => '📅 年度运势';
+
+  @override
+  String get annualModeSubtitle => '查看这一年的运势走向与每月重点';
 }
 
 /// The translations for Chinese, as used in Taiwan (`zh_TW`).
@@ -476,4 +488,10 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get notFortuneTelling => '不是算命，是「自我理解 + 關係翻譯」';
+
+  @override
+  String get annualMode => '📅 年度運勢';
+
+  @override
+  String get annualModeSubtitle => '查看這一年的運勢走向與每月重點';
 }

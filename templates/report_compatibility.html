@@ -7,41 +7,24 @@
 <script src="https://cdn.tailwindcss.com"></script>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;600;700;900&family=Noto+Sans+TC:wght@300;400;500;700&display=swap" rel="stylesheet">
 <style>
-  body {
-    font-family: 'Noto Sans TC', sans-serif;
-    background: #0f0f12;
-    color: #e8e6e3;
-  }
-  .serif { font-family: 'Noto Serif TC', serif; }
+  body { font-family:'Noto Sans TC',sans-serif; background:#0f0f12; color:#e8e6e3; }
+  .serif { font-family:'Noto Serif TC',serif; }
   .gradient-text {
-    background: linear-gradient(135deg, #d4af37 0%, #f5e6a3 50%, #d4af37 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
+    background:linear-gradient(135deg,#d4af37 0%,#f5e6a3 50%,#d4af37 100%);
+    -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;
   }
-  .card-glass {
-    background: rgba(255,255,255,0.03);
-    border: 1px solid rgba(255,255,255,0.06);
-    backdrop-filter: blur(10px);
-  }
-  .card-gold {
-    background: linear-gradient(135deg, rgba(212,175,55,0.08) 0%, rgba(212,175,55,0.02) 100%);
-    border: 1px solid rgba(212,175,55,0.15);
-  }
-  .blur-paywall {
-    filter: blur(4px);
-    opacity: 0.4;
-    pointer-events: none;
-    user-select: none;
-  }
-  .paywall-overlay {
-    background: linear-gradient(to bottom, rgba(15,15,18,0) 0%, rgba(15,15,18,0.95) 60%);
-  }
+  .card-glass { background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.06); backdrop-filter:blur(10px); }
+  .card-gold  { background:linear-gradient(135deg,rgba(212,175,55,0.08) 0%,rgba(212,175,55,0.02) 100%); border:1px solid rgba(212,175,55,0.15); }
+  .card-rose  { background:linear-gradient(135deg,rgba(244,63,94,0.06) 0%,rgba(244,63,94,0.01) 100%); border:1px solid rgba(244,63,94,0.12); }
+  .blur-paywall { filter:blur(4px); opacity:0.4; pointer-events:none; user-select:none; }
+  .paywall-overlay { background:linear-gradient(to bottom,rgba(15,15,18,0) 0%,rgba(15,15,18,0.95) 60%); }
+  .score-bar { height:6px; background:rgba(255,255,255,0.05); border-radius:9999px; overflow:hidden; }
+  .score-bar-fill { height:100%; border-radius:9999px; transition:width 0.6s ease; }
   @media print {
-    .no-print { display: none !important; }
-    body { background: white; color: #1a1a1a; }
-    .card-glass { background: #f8f8f8; border: 1px solid #e0e0e0; }
-    .gradient-text { background: none; -webkit-text-fill-color: #8b6914; color: #8b6914; }
+    .no-print { display:none !important; }
+    body { background:white; color:#1a1a1a; }
+    .card-glass { background:#f8f8f8; border:1px solid #e0e0e0; }
+    .gradient-text { background:none; -webkit-text-fill-color:#8b6914; color:#8b6914; }
   }
 </style>
 </head>
@@ -62,54 +45,348 @@
     <div class="absolute bottom-0 right-1/3 w-96 h-96 bg-amber-500/10 rounded-full blur-3xl"></div>
   </div>
   <div class="relative max-w-3xl mx-auto text-center">
-    <p class="text-amber-500/60 text-xs tracking-[0.3em] uppercase mb-4">Family Destiny · 關係合盤</p>
+    <p class="text-amber-500/60 text-xs tracking-[0.3em] uppercase mb-4">Family Destiny · 五系統合盤分析</p>
     <h1 class="serif text-4xl md:text-6xl font-black gradient-text mb-4">{{ name1 }} <span class="text-white/20">×</span> {{ name2 }}</h1>
-    <p class="text-white/40 text-sm mb-8">五系統交叉驗證 · 關係動力學分析</p>
+    <p class="text-white/40 text-sm mb-8">八字 · 占星 · 紫微 · 人類圖 · 星宿 — 五系統交叉驗證</p>
 
-    <!-- Relation Badge -->
-    <div class="inline-flex flex-col items-center">
-      <div class="px-6 py-3 rounded-full bg-rose-500/10 border border-rose-500/20 mb-2">
-        <span class="serif text-2xl font-bold text-rose-300">{{ relation_type }}</span>
+    <!-- Overall Score -->
+    <div class="inline-flex flex-col items-center gap-2">
+      <div class="flex items-baseline gap-3">
+        <span class="serif text-6xl font-black text-amber-300">{{ total }}</span>
+        <span class="text-white/30 text-xl">/ 5.0</span>
       </div>
-      <p class="text-white/50 text-sm">{{ relation_desc }}</p>
+      <span class="text-2xl tracking-wider">{{ stars }}</span>
+      <p class="serif text-lg text-white/70 italic mt-1">{{ summary_text }}</p>
+      <span class="mt-2 px-4 py-1.5 rounded-full bg-rose-500/10 border border-rose-500/20 text-rose-300 text-sm font-bold">{{ relation_type }}</span>
     </div>
   </div>
 </section>
 
-<!-- Free Section: Side by Side -->
-<section class="px-6 py-12">
+<!-- 合盤名片 -->
+<section class="px-6 pb-10 no-print">
+  <div class="max-w-4xl mx-auto">
+    <div class="flex items-center gap-4 mb-8">
+      <div class="h-px flex-1 bg-rose-500/10"></div>
+      <span class="text-xs text-rose-400/50 tracking-[0.3em] uppercase">合盤名片 · 截圖分享</span>
+      <div class="h-px flex-1 bg-rose-500/10"></div>
+    </div>
+
+    <div class="flex justify-center">
+      <div id="compat-card" style="
+        width:360px;height:560px;overflow:hidden;position:relative;
+        background:linear-gradient(145deg,#100d12 0%,#14101c 50%,#0f0c15 100%);
+        border-radius:24px;border:1px solid rgba(212,175,55,0.22);
+        padding:26px 24px 0;box-sizing:border-box;
+        font-family:'Noto Sans TC',sans-serif;">
+
+        <!-- Glow -->
+        <div style="position:absolute;top:-40px;left:50%;transform:translateX(-50%);width:220px;height:220px;background:radial-gradient(circle,rgba(244,63,94,0.09) 0%,transparent 70%);border-radius:50%;pointer-events:none;"></div>
+        <div style="position:absolute;bottom:60px;right:-30px;width:130px;height:130px;background:radial-gradient(circle,rgba(212,175,55,0.08) 0%,transparent 70%);border-radius:50%;pointer-events:none;"></div>
+
+        <!-- Branding -->
+        <div style="text-align:center;margin-bottom:14px;">
+          <span style="font-size:9px;letter-spacing:0.35em;color:rgba(212,175,55,0.4);text-transform:uppercase;">✦ &nbsp;Family Destiny &nbsp;·&nbsp; 合盤分析&nbsp; ✦</span>
+        </div>
+        <div style="height:1px;background:linear-gradient(90deg,transparent,rgba(212,175,55,0.22),transparent);margin-bottom:18px;"></div>
+
+        <!-- Names -->
+        <div style="text-align:center;margin-bottom:8px;">
+          <h2 style="font-family:'Noto Serif TC',serif;font-size:26px;font-weight:900;
+            background:linear-gradient(135deg,#d4af37 0%,#f5e6a3 50%,#d4af37 100%);
+            -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+            margin:0;letter-spacing:0.05em;">
+            {{ name1 }}&nbsp;<span style="-webkit-text-fill-color:rgba(255,255,255,0.22);color:rgba(255,255,255,0.22);">×</span>&nbsp;{{ name2 }}
+          </h2>
+        </div>
+
+        <!-- Score -->
+        <div style="text-align:center;margin-bottom:6px;">
+          <span style="font-size:20px;color:#d4af37;letter-spacing:3px;">{{ stars }}</span>
+          <span style="font-size:12px;color:rgba(255,255,255,0.3);margin-left:6px;">{{ total }} / 5.0</span>
+        </div>
+        <div style="text-align:center;margin-bottom:18px;">
+          <span style="font-size:12px;color:rgba(255,255,255,0.55);font-family:'Noto Serif TC',serif;font-style:italic;">{{ summary_text }}</span>
+        </div>
+
+        <!-- 4 Tag Boxes -->
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px;">
+
+          <div style="background:rgba(212,175,55,0.06);border:1px solid rgba(212,175,55,0.16);border-radius:12px;padding:10px 10px;text-align:center;">
+            <p style="font-size:8px;color:rgba(255,255,255,0.28);margin:0 0 4px;letter-spacing:0.1em;">八字日主</p>
+            <p style="font-family:'Noto Serif TC',serif;font-size:17px;font-weight:900;color:#d4af37;margin:0;line-height:1.2;">{{ p1.bazi.day_master }}&thinsp;×&thinsp;{{ p2.bazi.day_master }}</p>
+            <p style="font-size:9px;color:rgba(255,255,255,0.32);margin:3px 0 0;">{{ bazi_score }} / 5.0</p>
+          </div>
+
+          <div style="background:rgba(212,175,55,0.06);border:1px solid rgba(212,175,55,0.16);border-radius:12px;padding:10px 10px;text-align:center;">
+            <p style="font-size:8px;color:rgba(255,255,255,0.28);margin:0 0 4px;letter-spacing:0.1em;">太陽星座</p>
+            <p style="font-family:'Noto Serif TC',serif;font-size:13px;font-weight:900;color:#d4af37;margin:0;line-height:1.3;">{{ p1.astrology.太陽.sign }}×{{ p2.astrology.太陽.sign }}</p>
+            <p style="font-size:9px;color:rgba(255,255,255,0.32);margin:3px 0 0;">{{ astro_score }} / 5.0</p>
+          </div>
+
+          <div style="background:rgba(244,63,94,0.06);border:1px solid rgba(244,63,94,0.16);border-radius:12px;padding:10px 10px;text-align:center;">
+            <p style="font-size:8px;color:rgba(255,255,255,0.28);margin:0 0 3px;letter-spacing:0.1em;">人類圖</p>
+            <p style="font-family:'Noto Serif TC',serif;font-size:11px;font-weight:900;color:#fb7185;margin:0;line-height:1.5;">{{ p1.humandesign.energy_type }}<br>{{ p2.humandesign.energy_type }}</p>
+            <p style="font-size:9px;color:rgba(255,255,255,0.32);margin:3px 0 0;">{{ hd_score }} / 5.0</p>
+          </div>
+
+          <div style="background:rgba(244,63,94,0.06);border:1px solid rgba(244,63,94,0.16);border-radius:12px;padding:10px 10px;text-align:center;">
+            <p style="font-size:8px;color:rgba(255,255,255,0.28);margin:0 0 4px;letter-spacing:0.1em;">桃花星</p>
+            <p style="font-family:'Noto Serif TC',serif;font-size:22px;font-weight:900;color:#fb7185;margin:0;line-height:1;">{{ taohua_score }}</p>
+            <p style="font-size:9px;color:rgba(255,255,255,0.32);margin:3px 0 0;">{{ taohua_note.split('·')[0][:14] if '·' in taohua_note else taohua_note[:14] }}</p>
+          </div>
+        </div>
+
+        <!-- Insight Quote -->
+        <div style="background:rgba(255,255,255,0.025);border-left:2px solid rgba(212,175,55,0.4);border-radius:0 10px 10px 0;padding:11px 14px;">
+          <p style="font-family:'Noto Serif TC',serif;font-size:12px;color:rgba(255,255,255,0.65);line-height:1.85;margin:0;">「{{ card_highlight }}」</p>
+        </div>
+
+        <!-- Bottom Branding -->
+        <div style="position:absolute;bottom:0;left:0;right:0;padding:0 24px 18px;">
+          <div style="height:1px;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.06),transparent);margin-bottom:10px;"></div>
+          <div style="display:flex;justify-content:space-between;align-items:center;">
+            <span style="font-size:9px;color:rgba(255,255,255,0.18);">五系統合盤 · 命理 AI 解讀</span>
+            <span style="font-size:9px;color:rgba(212,175,55,0.35);">family-destiny.app</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="flex gap-3 justify-center mt-6">
+      <button id="compat-download-btn" onclick="downloadCompatCard()"
+        class="flex items-center gap-2 px-6 py-3 rounded-full bg-rose-500/10 border border-rose-500/30 text-rose-300 text-sm font-bold hover:bg-rose-500/20 active:scale-95 transition-all">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+        儲存合盤名片
+      </button>
+      <button id="compat-copy-btn" onclick="copyCompatLink()"
+        class="flex items-center gap-2 px-6 py-3 rounded-full bg-white/5 border border-white/10 text-white/50 text-sm font-bold hover:bg-white/10 active:scale-95 transition-all">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"/></svg>
+        複製連結
+      </button>
+    </div>
+  </div>
+</section>
+
+<!-- Side by Side Profiles -->
+<section class="px-6 py-10">
   <div class="max-w-4xl mx-auto">
     <div class="flex items-center gap-4 mb-8">
       <div class="h-px flex-1 bg-white/5"></div>
-      <span class="text-xs text-amber-500/60 tracking-[0.3em] uppercase">基礎合盤 · 免費</span>
+      <span class="text-xs text-amber-500/60 tracking-[0.3em] uppercase">雙人命格對照</span>
+      <div class="h-px flex-1 bg-white/5"></div>
+    </div>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div class="card-glass rounded-2xl p-6">
+        <h3 class="serif text-2xl font-bold gradient-text mb-1">{{ name1 }}</h3>
+        <p class="text-white/40 text-xs mb-5">{{ p1.summary }}</p>
+        <div class="space-y-2.5 text-sm">
+          <div class="flex justify-between"><span class="text-white/40">日主</span><span class="font-bold text-amber-300">{{ p1.bazi.day_master }}</span></div>
+          <div class="flex justify-between"><span class="text-white/40">太陽</span><span class="text-white/80">{{ p1.astrology.太陽.sign }}座</span></div>
+          <div class="flex justify-between"><span class="text-white/40">月亮</span><span class="text-white/80">{{ p1.astrology.月亮.sign }}座</span></div>
+          <div class="flex justify-between"><span class="text-white/40">命宮</span><span class="text-white/80">{{ p1.ziwei.命宮 }}</span></div>
+          <div class="flex justify-between"><span class="text-white/40">人類圖</span><span class="text-white/80">{{ p1.humandesign.energy_type }} {{ p1.humandesign.profile }}</span></div>
+          <div class="flex justify-between"><span class="text-white/40">星宿</span><span class="text-white/80">{{ p1.xingxiu }}宿</span></div>
+        </div>
+      </div>
+      <div class="card-glass rounded-2xl p-6">
+        <h3 class="serif text-2xl font-bold gradient-text mb-1">{{ name2 }}</h3>
+        <p class="text-white/40 text-xs mb-5">{{ p2.summary }}</p>
+        <div class="space-y-2.5 text-sm">
+          <div class="flex justify-between"><span class="text-white/40">日主</span><span class="font-bold text-amber-300">{{ p2.bazi.day_master }}</span></div>
+          <div class="flex justify-between"><span class="text-white/40">太陽</span><span class="text-white/80">{{ p2.astrology.太陽.sign }}座</span></div>
+          <div class="flex justify-between"><span class="text-white/40">月亮</span><span class="text-white/80">{{ p2.astrology.月亮.sign }}座</span></div>
+          <div class="flex justify-between"><span class="text-white/40">命宮</span><span class="text-white/80">{{ p2.ziwei.命宮 }}</span></div>
+          <div class="flex justify-between"><span class="text-white/40">人類圖</span><span class="text-white/80">{{ p2.humandesign.energy_type }} {{ p2.humandesign.profile }}</span></div>
+          <div class="flex justify-between"><span class="text-white/40">星宿</span><span class="text-white/80">{{ p2.xingxiu }}宿</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 五維度評分 -->
+<section class="px-6 py-10">
+  <div class="max-w-4xl mx-auto">
+    <div class="flex items-center gap-4 mb-8">
+      <div class="h-px flex-1 bg-white/5"></div>
+      <span class="text-xs text-amber-500/60 tracking-[0.3em] uppercase">五維度合盤評分</span>
       <div class="h-px flex-1 bg-white/5"></div>
     </div>
 
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-      <!-- Person 1 -->
-      <div class="card-glass rounded-2xl p-6">
-        <h3 class="serif text-2xl font-bold gradient-text mb-1">{{ name1 }}</h3>
-        <p class="text-white/40 text-xs mb-6">{{ p1.summary }}</p>
-        <div class="space-y-2 text-sm">
-          <div class="flex justify-between"><span class="text-white/40">日主</span><span class="font-bold text-amber-300">{{ p1.bazi.day_master }}</span></div>
-          <div class="flex justify-between"><span class="text-white/40">太陽</span><span class="font-bold text-white/80">{{ p1.astrology.太陽.sign }}</span></div>
-          <div class="flex justify-between"><span class="text-white/40">命宮</span><span class="font-bold text-white/80">{{ p1.ziwei.命宮 }}</span></div>
-          <div class="flex justify-between"><span class="text-white/40">人類圖</span><span class="font-bold text-white/80">{{ p1.humandesign.energy_type }}</span></div>
-          <div class="flex justify-between"><span class="text-white/40">星宿</span><span class="font-bold text-white/80">{{ p1.xingxiu }}宿</span></div>
+    <div class="card-glass rounded-2xl p-6 md:p-8 space-y-7">
+
+      <!-- 綜合 -->
+      <div class="pb-6 border-b border-white/5">
+        <div class="flex items-center justify-between mb-3">
+          <div>
+            <span class="font-bold text-white/90">綜合指數</span>
+            <span class="ml-2 text-white/30 text-xs">八字×占星×紫微×人類圖×星宿 加權</span>
+          </div>
+          <div class="flex items-baseline gap-2">
+            <span class="serif text-3xl font-black text-amber-300">{{ total }}</span>
+            <span class="text-white/30">/ 5.0</span>
+          </div>
         </div>
+        <div class="score-bar mb-2">
+          <div class="score-bar-fill bg-gradient-to-r from-amber-500 to-amber-300" style="width:{{ ((total - 1) / 4 * 100) | int }}%"></div>
+        </div>
+        <p class="serif text-sm text-white/60 italic">{{ summary_text }}</p>
       </div>
 
-      <!-- Person 2 -->
-      <div class="card-glass rounded-2xl p-6">
-        <h3 class="serif text-2xl font-bold gradient-text mb-1">{{ name2 }}</h3>
-        <p class="text-white/40 text-xs mb-6">{{ p2.summary }}</p>
-        <div class="space-y-2 text-sm">
-          <div class="flex justify-between"><span class="text-white/40">日主</span><span class="font-bold text-amber-300">{{ p2.bazi.day_master }}</span></div>
-          <div class="flex justify-between"><span class="text-white/40">太陽</span><span class="font-bold text-white/80">{{ p2.astrology.太陽.sign }}</span></div>
-          <div class="flex justify-between"><span class="text-white/40">命宮</span><span class="font-bold text-white/80">{{ p2.ziwei.命宮 }}</span></div>
-          <div class="flex justify-between"><span class="text-white/40">人類圖</span><span class="font-bold text-white/80">{{ p2.humandesign.energy_type }}</span></div>
-          <div class="flex justify-between"><span class="text-white/40">星宿</span><span class="font-bold text-white/80">{{ p2.xingxiu }}宿</span></div>
+      <!-- 八字 -->
+      <div>
+        <div class="flex items-center justify-between mb-2">
+          <div class="flex items-center gap-2.5">
+            <span class="w-2 h-2 rounded-full bg-amber-400 shrink-0"></span>
+            <span class="text-sm text-white/70">八字合盤</span>
+          </div>
+          <span class="serif font-bold text-amber-300">{{ bazi_score }}</span>
         </div>
+        <div class="score-bar mb-1.5">
+          <div class="score-bar-fill bg-amber-400/70" style="width:{{ ((bazi_score - 1) / 4 * 100) | int }}%"></div>
+        </div>
+        <p class="text-xs text-white/30 leading-relaxed">{{ bazi_note }}</p>
+      </div>
+
+      <!-- 占星 -->
+      <div>
+        <div class="flex items-center justify-between mb-2">
+          <div class="flex items-center gap-2.5">
+            <span class="w-2 h-2 rounded-full bg-sky-400 shrink-0"></span>
+            <span class="text-sm text-white/70">占星合盤</span>
+          </div>
+          <span class="serif font-bold text-sky-300">{{ astro_score }}</span>
+        </div>
+        <div class="score-bar mb-1.5">
+          <div class="score-bar-fill bg-sky-400/70" style="width:{{ ((astro_score - 1) / 4 * 100) | int }}%"></div>
+        </div>
+        <p class="text-xs text-white/30 leading-relaxed">{{ astro_note }}</p>
+      </div>
+
+      <!-- 紫微 -->
+      <div>
+        <div class="flex items-center justify-between mb-2">
+          <div class="flex items-center gap-2.5">
+            <span class="w-2 h-2 rounded-full bg-violet-400 shrink-0"></span>
+            <span class="text-sm text-white/70">紫微合盤</span>
+          </div>
+          <span class="serif font-bold text-violet-300">{{ ziwei_score }}</span>
+        </div>
+        <div class="score-bar mb-1.5">
+          <div class="score-bar-fill bg-violet-400/70" style="width:{{ ((ziwei_score - 1) / 4 * 100) | int }}%"></div>
+        </div>
+        <p class="text-xs text-white/30 leading-relaxed">{{ ziwei_note }}</p>
+      </div>
+
+      <!-- 人類圖 -->
+      <div>
+        <div class="flex items-center justify-between mb-2">
+          <div class="flex items-center gap-2.5">
+            <span class="w-2 h-2 rounded-full bg-teal-400 shrink-0"></span>
+            <span class="text-sm text-white/70">人類圖合盤</span>
+          </div>
+          <span class="serif font-bold text-teal-300">{{ hd_score }}</span>
+        </div>
+        <div class="score-bar mb-1.5">
+          <div class="score-bar-fill bg-teal-400/70" style="width:{{ ((hd_score - 1) / 4 * 100) | int }}%"></div>
+        </div>
+        <p class="text-xs text-white/30 leading-relaxed">{{ hd_note }}</p>
+      </div>
+
+      <!-- 星宿 -->
+      <div>
+        <div class="flex items-center justify-between mb-2">
+          <div class="flex items-center gap-2.5">
+            <span class="w-2 h-2 rounded-full bg-rose-400 shrink-0"></span>
+            <span class="text-sm text-white/70">星宿合盤</span>
+          </div>
+          <span class="serif font-bold text-rose-300">{{ xingxiu_score }}</span>
+        </div>
+        <div class="score-bar mb-1.5">
+          <div class="score-bar-fill bg-rose-400/70" style="width:{{ ((xingxiu_score - 1) / 4 * 100) | int }}%"></div>
+        </div>
+        <p class="text-xs text-white/30 leading-relaxed">{{ xingxiu_note }}</p>
+        {% if xx_detail and xx_detail.description %}
+        <p class="text-xs text-amber-500/50 mt-1">{{ xx_detail.description }}</p>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 延伸合盤分析 -->
+<section class="px-6 py-10">
+  <div class="max-w-4xl mx-auto">
+    <div class="flex items-center gap-4 mb-8">
+      <div class="h-px flex-1 bg-white/5"></div>
+      <span class="text-xs text-rose-400/60 tracking-[0.3em] uppercase">延伸合盤 · 深度洞察</span>
+      <div class="h-px flex-1 bg-white/5"></div>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+
+      <!-- 桃花星 / 紅鸞天喜 -->
+      <div class="card-rose rounded-2xl p-6">
+        <div class="flex items-center justify-between mb-3">
+          <div class="flex items-center gap-2">
+            <span class="text-rose-400 text-xl">🌸</span>
+            <h3 class="font-bold text-white/90 text-sm">桃花星 / 紅鸞天喜</h3>
+          </div>
+          <span class="serif text-2xl font-black text-rose-300">{{ taohua_score }}</span>
+        </div>
+        <div class="score-bar mb-3">
+          <div class="score-bar-fill bg-rose-400/60" style="width:{{ ((taohua_score - 1) / 4 * 100) | int }}%"></div>
+        </div>
+        <p class="text-sm text-white/45 leading-relaxed">{{ taohua_note }}</p>
+      </div>
+
+      <!-- 占星宮位疊加 -->
+      <div class="card-gold rounded-2xl p-6">
+        <div class="flex items-center justify-between mb-3">
+          <div class="flex items-center gap-2">
+            <span class="text-sky-400 text-xl">🏛</span>
+            <h3 class="font-bold text-white/90 text-sm">占星宮位疊加</h3>
+          </div>
+          <span class="serif text-2xl font-black text-sky-300">{{ overlay_score }}</span>
+        </div>
+        <div class="score-bar mb-3">
+          <div class="score-bar-fill bg-sky-400/60" style="width:{{ ((overlay_score - 1) / 4 * 100) | int }}%"></div>
+        </div>
+        <p class="text-sm text-white/45 leading-relaxed">{{ overlay_note }}</p>
+      </div>
+
+      <!-- Composite 複合盤 -->
+      <div class="card-gold rounded-2xl p-6">
+        <div class="flex items-center justify-between mb-3">
+          <div class="flex items-center gap-2">
+            <span class="text-violet-400 text-xl">⭕</span>
+            <h3 class="font-bold text-white/90 text-sm">Composite 複合盤</h3>
+          </div>
+          <span class="serif text-2xl font-black text-violet-300">{{ composite_score }}</span>
+        </div>
+        <div class="score-bar mb-3">
+          <div class="score-bar-fill bg-violet-400/60" style="width:{{ ((composite_score - 1) / 4 * 100) | int }}%"></div>
+        </div>
+        <p class="text-sm text-white/45 leading-relaxed">{{ composite_note }}</p>
+      </div>
+
+      <!-- 合盤流年 -->
+      <div class="card-glass rounded-2xl p-6">
+        <div class="flex items-center gap-2 mb-3">
+          <span class="text-teal-400 text-xl">🔄</span>
+          <h3 class="font-bold text-white/90 text-sm">合盤流年（大運交叉）</h3>
+        </div>
+        {% if year_delta is not none %}
+        <div class="inline-flex items-center gap-1.5 mb-3 px-3 py-1 rounded-full border text-sm font-bold
+          {% if year_delta >= 0.3 %}bg-teal-500/10 border-teal-500/20 text-teal-300
+          {% elif year_delta <= -0.2 %}bg-orange-500/10 border-orange-500/20 text-orange-300
+          {% else %}bg-white/5 border-white/10 text-white/50{% endif %}">
+          {% if year_delta >= 0 %}▲ +{{ year_delta | round(1) }} 合盤加分
+          {% else %}▼ {{ year_delta | round(1) }} 合盤壓力{% endif %}
+        </div>
+        {% endif %}
+        <p class="text-sm text-white/45 leading-relaxed">{{ year_note }}</p>
       </div>
     </div>
   </div>
@@ -125,7 +402,7 @@
         <div class="h-px flex-1 bg-rose-500/20"></div>
       </div>
       <div class="card-gold rounded-2xl p-8 text-center">
-        <p class="serif text-2xl text-white/60 italic">「當 {{ p1.bazi.day_master }} 遇見 {{ p2.bazi.day_master }}，一場 {{ relation_type }} 的化學反應即將展開...」</p>
+        <p class="serif text-2xl text-white/60 italic">「當 {{ p1.bazi.day_master }} 遇見 {{ p2.bazi.day_master }}，一場 {{ relation_type }} 的化學反應正在展開⋯」</p>
       </div>
     </div>
     <div class="paywall-overlay absolute inset-0 flex items-end justify-center pb-12 no-print">
@@ -153,6 +430,46 @@
 <footer class="px-6 py-12 text-center">
   <p class="text-white/20 text-xs">Family Destiny · 五系統命理解讀 · 不是算命，是關係理解</p>
 </footer>
+
+<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+<script>
+async function downloadCompatCard() {
+  const card = document.getElementById('compat-card');
+  const btn  = document.getElementById('compat-download-btn');
+  const orig = btn.innerHTML;
+  btn.innerHTML = '⏳ 生成中…';
+  btn.disabled = true;
+
+  try {
+    await document.fonts.ready;
+    const canvas = await html2canvas(card, {
+      scale: 3, useCORS: true, allowTaint: true,
+      backgroundColor: null, logging: false, imageTimeout: 15000,
+    });
+    const link = document.createElement('a');
+    link.download = '合盤名片_{{ name1 }}×{{ name2 }}.png';
+    link.href = canvas.toDataURL('image/png');
+    link.click();
+    btn.innerHTML = '✓ 已儲存';
+    setTimeout(() => { btn.innerHTML = orig; btn.disabled = false; }, 2000);
+  } catch (e) {
+    alert('圖片生成失敗，請直接截圖儲存。');
+    btn.innerHTML = orig;
+    btn.disabled = false;
+  }
+}
+
+function copyCompatLink() {
+  const btn  = document.getElementById('compat-copy-btn');
+  const orig = btn.innerHTML;
+  navigator.clipboard.writeText(window.location.href).then(() => {
+    btn.textContent = '✓ 已複製';
+    setTimeout(() => { btn.innerHTML = orig; }, 2000);
+  }).catch(() => {
+    prompt('複製此連結：', window.location.href);
+  });
+}
+</script>
 
 </body>
 </html>

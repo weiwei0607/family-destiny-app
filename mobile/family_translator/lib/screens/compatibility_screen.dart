@@ -27,8 +27,7 @@ class _CompatibilityScreenState extends State<CompatibilityScreen> {
     );
     if (picked != null) {
       setState(() {
-        if (person == 1) _date1 = picked;
-        else _date2 = picked;
+        if (person == 1) { _date1 = picked; } else { _date2 = picked; }
       });
     }
   }
@@ -40,8 +39,7 @@ class _CompatibilityScreenState extends State<CompatibilityScreen> {
     );
     if (picked != null) {
       setState(() {
-        if (person == 1) _time1 = picked;
-        else _time2 = picked;
+        if (person == 1) { _time1 = picked; } else { _time2 = picked; }
       });
     }
   }
@@ -111,7 +109,7 @@ class _CompatibilityScreenState extends State<CompatibilityScreen> {
         ),
         const SizedBox(height: 12),
         DropdownButtonFormField<String>(
-          value: gender,
+          initialValue: gender,
           decoration: const InputDecoration(
             labelText: '性別',
             border: OutlineInputBorder(),
@@ -121,8 +119,7 @@ class _CompatibilityScreenState extends State<CompatibilityScreen> {
             DropdownMenuItem(value: '男', child: Text('男')),
           ],
           onChanged: (v) => setState(() {
-            if (isPerson1) _gender1 = v!;
-            else _gender2 = v!;
+            if (isPerson1) { _gender1 = v!; } else { _gender2 = v!; }
           }),
         ),
         const SizedBox(height: 12),

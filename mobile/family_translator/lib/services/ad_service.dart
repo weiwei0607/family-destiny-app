@@ -40,7 +40,7 @@ class RewardedAdManager {
 
   /// Load a new rewarded ad
   Future<void> loadAd() async {
-    if (_isLoading || _rewardedAd != null) return;
+    if (_isLoading || _rewardedAd != null || _numLoadAttempts >= _maxLoadAttempts) return;
     _isLoading = true;
 
     await RewardedAd.load(

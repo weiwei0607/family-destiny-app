@@ -82,6 +82,11 @@ XINGXIU_RELATION_DETAILS = {
         'dynamics': '一方讓另一方成長，但也帶來不安',
         'advice': '危方學會信任，成方學會耐心'
     },
+    '寶義': {
+        'description': '對宮相遇，寶貴義緣',
+        'dynamics': '如磁鐵兩極，彼此補足、視野互補，相處有一種命中注定的完整感',
+        'advice': '珍惜這份義緣，彼此的差異正是最大的成長禮物'
+    },
     '鄰近': {
         'description': '星宿相鄰',
         'dynamics': '關係微妙，介于兩種類型之間',
@@ -115,18 +120,20 @@ def relation(x1, x2):
         x2: 第二個星宿名稱
     
     Returns:
-        str: 關係類型（命之星/業胎/安壞/榮親/友衰/危成/鄰近）
+        str: 關係類型（命之星/業胎/安壞/榮親/友衰/危成/寶義/鄰近）
     """
     try:
         idx1 = XINGXIU.index(x1)
         idx2 = XINGXIU.index(x2)
     except ValueError:
         return '未知'
-    
+
     d = (idx2 - idx1) % 28
-    
+
     if d == 0:
         return '命之星'
+    elif d == 14:
+        return '寶義'       # 對宮（正對面），寶貴義緣
     elif d in [1, 27]:
         return '業胎'
     elif d in [2, 3, 25, 26]:
@@ -135,12 +142,8 @@ def relation(x1, x2):
         return '榮親'
     elif d in [6, 7, 21, 22]:
         return '友衰'
-    elif d in [8, 9, 10, 11, 12, 13, 15, 16, 17, 18, 19, 20]:
-        return '危成'
-    elif d == 14:
-        return '命之星'
     else:
-        return '鄰近'
+        return '危成'       # d in 8-13, 15-20
 
 
 def relation_detail(x1, x2):

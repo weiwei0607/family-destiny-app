@@ -101,10 +101,10 @@ def western_astrology(dt, lat=25.0330, lon=121.5654):
     }
     signs = ['牡羊','金牛','雙子','巨蟹','獅子','處女','天秤','天蠍','射手','摩羯','水瓶','雙魚']
     result = {}
-    for name, body in bodies.items():
+    for planet_name, body in bodies.items():
         ra, dec, dist = e.observe(body).apparent().radec()
-        lon = ra.hours * 15
-        sign = signs[int(lon // 30) % 12]
-        deg = lon % 30
-        result[name] = {'sign': sign, 'degree': round(deg, 1), 'longitude': lon}
+        ecl_lon = ra.hours * 15
+        sign = signs[int(ecl_lon // 30) % 12]
+        deg = ecl_lon % 30
+        result[planet_name] = {'sign': sign, 'degree': round(deg, 1), 'longitude': ecl_lon}
     return result

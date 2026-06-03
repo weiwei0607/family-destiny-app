@@ -88,6 +88,121 @@
   </div>
 </section>
 
+<!-- ══ 命運名片 ══ -->
+<section class="px-6 pb-10 no-print" id="destiny-card-section">
+  <div class="max-w-3xl mx-auto">
+    <div class="flex items-center gap-4 mb-8">
+      <div class="h-px flex-1 bg-white/5"></div>
+      <span class="text-xs text-amber-500/60 tracking-[0.3em] uppercase">命運名片 · 截圖分享</span>
+      <div class="h-px flex-1 bg-white/5"></div>
+    </div>
+
+    <!-- Card wrapper — fixed 360×640 for consistent screenshots -->
+    <div class="flex justify-center">
+      <div id="destiny-card" style="
+        width:360px; height:640px; overflow:hidden; position:relative;
+        background:linear-gradient(145deg,#0d0d10 0%,#12101a 50%,#0e0c15 100%);
+        border-radius:24px; border:1px solid rgba(212,175,55,0.25);
+        padding:28px 26px 0; box-sizing:border-box;
+        font-family:'Noto Sans TC',sans-serif;">
+
+        <!-- Glow orbs (decorative, no interaction) -->
+        <div style="position:absolute;top:-50px;right:-50px;width:180px;height:180px;background:radial-gradient(circle,rgba(212,175,55,0.10) 0%,transparent 70%);border-radius:50%;pointer-events:none;"></div>
+        <div style="position:absolute;bottom:60px;left:-50px;width:150px;height:150px;background:radial-gradient(circle,rgba(139,92,246,0.10) 0%,transparent 70%);border-radius:50%;pointer-events:none;"></div>
+
+        <!-- Top branding -->
+        <div style="text-align:center;margin-bottom:18px;">
+          <span style="font-size:9px;letter-spacing:0.35em;color:rgba(212,175,55,0.45);text-transform:uppercase;">✦ &nbsp;Family Destiny &nbsp;·&nbsp; 五系統命理&nbsp; ✦</span>
+        </div>
+
+        <!-- Divider -->
+        <div style="height:1px;background:linear-gradient(90deg,transparent,rgba(212,175,55,0.25),transparent);margin-bottom:18px;"></div>
+
+        <!-- Name -->
+        <div style="text-align:center;margin-bottom:5px;">
+          <h2 style="font-family:'Noto Serif TC',serif;font-size:34px;font-weight:900;
+            background:linear-gradient(135deg,#d4af37 0%,#f5e6a3 50%,#d4af37 100%);
+            -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+            background-clip:text;margin:0;line-height:1.2;">{{ name }}</h2>
+        </div>
+        <div style="text-align:center;margin-bottom:20px;">
+          <span style="font-size:11px;color:rgba(255,255,255,0.28);letter-spacing:0.05em;">{{ date }} &nbsp;·&nbsp; {{ gender }}</span>
+        </div>
+
+        <!-- 4 Identity Boxes (2×2 grid) -->
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-bottom:18px;">
+
+          <!-- 八字日主 -->
+          <div style="background:rgba(212,175,55,0.06);border:1px solid rgba(212,175,55,0.18);border-radius:14px;padding:11px 12px;text-align:center;">
+            <p style="font-size:8px;color:rgba(255,255,255,0.28);margin:0 0 4px;letter-spacing:0.12em;text-transform:uppercase;">八字日主</p>
+            <p style="font-family:'Noto Serif TC',serif;font-size:22px;font-weight:900;color:#d4af37;margin:0;line-height:1;">{{ bazi.day_master }}</p>
+            <p style="font-size:10px;color:rgba(255,255,255,0.45);margin:4px 0 0;">{{ portrait.day_master_strength.note }}</p>
+          </div>
+
+          <!-- 太陽星座 -->
+          <div style="background:rgba(212,175,55,0.06);border:1px solid rgba(212,175,55,0.18);border-radius:14px;padding:11px 12px;text-align:center;">
+            <p style="font-size:8px;color:rgba(255,255,255,0.28);margin:0 0 4px;letter-spacing:0.12em;text-transform:uppercase;">太陽星座</p>
+            <p style="font-family:'Noto Serif TC',serif;font-size:18px;font-weight:900;color:#d4af37;margin:0;line-height:1.2;">{{ astrology.太陽.sign }}座</p>
+            <p style="font-size:10px;color:rgba(255,255,255,0.45);margin:4px 0 0;">月亮 {{ astrology.月亮.sign }}</p>
+          </div>
+
+          <!-- 人類圖 -->
+          <div style="background:rgba(139,92,246,0.07);border:1px solid rgba(139,92,246,0.18);border-radius:14px;padding:11px 12px;text-align:center;">
+            <p style="font-size:8px;color:rgba(255,255,255,0.28);margin:0 0 4px;letter-spacing:0.12em;text-transform:uppercase;">人類圖</p>
+            <p style="font-family:'Noto Serif TC',serif;font-size:15px;font-weight:900;color:#a78bfa;margin:0;line-height:1.3;">{{ humandesign.energy_type }}</p>
+            <p style="font-size:10px;color:rgba(255,255,255,0.45);margin:4px 0 0;">{{ humandesign.profile }} · {{ humandesign.authority }}</p>
+          </div>
+
+          <!-- 紫微 + 星宿 -->
+          <div style="background:rgba(139,92,246,0.07);border:1px solid rgba(139,92,246,0.18);border-radius:14px;padding:11px 12px;text-align:center;">
+            <p style="font-size:8px;color:rgba(255,255,255,0.28);margin:0 0 4px;letter-spacing:0.12em;text-transform:uppercase;">紫微命宮</p>
+            <p style="font-family:'Noto Serif TC',serif;font-size:15px;font-weight:900;color:#a78bfa;margin:0;line-height:1.3;">{{ ziwei.命宮 }}</p>
+            <p style="font-size:10px;color:rgba(255,255,255,0.45);margin:4px 0 0;">{{ xingxiu }}宿</p>
+          </div>
+        </div>
+
+        <!-- Life Quote -->
+        <div style="background:rgba(255,255,255,0.025);border-left:2px solid rgba(212,175,55,0.45);border-radius:0 12px 12px 0;padding:13px 15px;margin-bottom:16px;">
+          <p style="font-family:'Noto Serif TC',serif;font-size:12.5px;color:rgba(255,255,255,0.72);line-height:1.85;margin:0;">「{{ card_quote }}」</p>
+        </div>
+
+        <!-- Missing Elements -->
+        {% if bazi_wuxing and bazi_wuxing.missing %}
+        <div style="display:flex;align-items:center;gap:7px;flex-wrap:wrap;margin-bottom:0;">
+          <span style="font-size:10px;color:rgba(255,255,255,0.28);">命缺：</span>
+          {% for wx in bazi_wuxing.missing %}
+          <span style="font-size:11px;color:rgba(212,175,55,0.7);background:rgba(212,175,55,0.07);border:1px solid rgba(212,175,55,0.2);border-radius:20px;padding:2px 11px;">{{ wx }}行</span>
+          {% endfor %}
+        </div>
+        {% endif %}
+
+        <!-- Bottom Branding (pinned to bottom) -->
+        <div style="position:absolute;bottom:0;left:0;right:0;padding:0 26px 22px;">
+          <div style="height:1px;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.07),transparent);margin-bottom:11px;"></div>
+          <div style="display:flex;justify-content:space-between;align-items:center;">
+            <span style="font-size:9px;color:rgba(255,255,255,0.18);letter-spacing:0.1em;">八字 · 占星 · 紫微 · 人類圖 · 星宿</span>
+            <span style="font-size:9px;color:rgba(212,175,55,0.38);letter-spacing:0.05em;">family-destiny.app</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="flex gap-3 justify-center mt-6">
+      <button id="download-btn" onclick="downloadCard()"
+        class="flex items-center gap-2 px-6 py-3 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-300 text-sm font-bold hover:bg-amber-500/20 active:scale-95 transition-all">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+        儲存圖片
+      </button>
+      <button id="copy-btn" onclick="copyLink()"
+        class="flex items-center gap-2 px-6 py-3 rounded-full bg-white/5 border border-white/10 text-white/50 text-sm font-bold hover:bg-white/10 active:scale-95 transition-all">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"/></svg>
+        複製連結
+      </button>
+    </div>
+  </div>
+</section>
+
 <!-- Free Section: Five Systems -->
 <section class="px-6 py-12">
   <div class="max-w-3xl mx-auto">
@@ -384,6 +499,459 @@
   </div>
 </section>
 
+<!-- Free Section: 年度運勢預覽 -->
+<section class="px-6 pb-10">
+  <div class="max-w-3xl mx-auto">
+    <div class="flex items-center gap-4 mb-6">
+      <div class="h-px flex-1 bg-white/5"></div>
+      <span class="text-xs text-amber-500/60 tracking-[0.3em] uppercase">今年運勢 · 免費預覽</span>
+      <div class="h-px flex-1 bg-white/5"></div>
+    </div>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+
+      {% if bazi_structure %}
+      <div class="card-glass rounded-2xl p-6">
+        <div class="flex items-center gap-2 mb-4">
+          <span class="text-lg">📐</span>
+          <h3 class="font-bold text-white/90">八字格局</h3>
+        </div>
+        <div class="space-y-2 text-sm">
+          <div class="flex items-center justify-between">
+            <span class="text-white/50">格局</span>
+            <span class="serif font-bold text-amber-300">{{ bazi_structure.ju }}</span>
+          </div>
+          <div class="flex items-center justify-between">
+            <span class="text-white/50">日主強弱</span>
+            <span class="text-white/80">{% if bazi_structure.strength == 'strong' %}身強{% elif bazi_structure.strength == 'slightly_strong' %}偏旺{% elif bazi_structure.strength == 'neutral' %}中和{% elif bazi_structure.strength == 'slightly_weak' %}偏弱{% else %}身弱{% endif %}</span>
+          </div>
+          {% if bazi_structure.xiyong %}
+          <div class="pt-2">
+            <p class="text-[10px] text-white/30 mb-2">喜用神（有利五行）</p>
+            <div class="flex gap-1.5 flex-wrap">
+              {% for wx in bazi_structure.xiyong %}
+              <span class="px-2 py-1 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-xs text-emerald-300">{{ wx }}</span>
+              {% endfor %}
+            </div>
+          </div>
+          {% endif %}
+          {% if bazi_structure.jishen %}
+          <div>
+            <p class="text-[10px] text-white/30 mb-2">忌神（不利五行）</p>
+            <div class="flex gap-1.5 flex-wrap">
+              {% for wx in bazi_structure.jishen %}
+              <span class="px-2 py-1 rounded-lg bg-red-500/10 border border-red-500/20 text-xs text-red-300">{{ wx }}</span>
+              {% endfor %}
+            </div>
+          </div>
+          {% endif %}
+          {% if bazi_structure.sanhe or bazi_structure.banhe %}
+          <div>
+            <p class="text-[10px] text-white/30 mb-2">地支合局</p>
+            <div class="flex gap-1.5 flex-wrap">
+              {% for s in bazi_structure.sanhe %}
+              <span class="px-2 py-1 rounded-lg bg-purple-500/10 text-xs text-purple-300">{{ s }}</span>
+              {% endfor %}
+              {% for s in bazi_structure.banhe %}
+              <span class="px-2 py-1 rounded-lg bg-blue-500/10 text-xs text-blue-300">{{ s }}</span>
+              {% endfor %}
+            </div>
+          </div>
+          {% endif %}
+          {% if bazi_structure.tiaohou_desc %}
+          <p class="text-xs text-amber-400/80 pt-1">{{ bazi_structure.tiaohou_desc }}</p>
+          {% endif %}
+        </div>
+      </div>
+      {% endif %}
+
+      {% if bazi_kongwang %}
+      <div class="card-glass rounded-2xl p-6">
+        <div class="flex items-center gap-2 mb-4">
+          <span class="text-lg">🕳</span>
+          <h3 class="font-bold text-white/90">空亡（旬空）</h3>
+          <span class="ml-auto text-xs text-white/30">{{ bazi_kongwang.xun_head }}旬</span>
+        </div>
+        <div class="space-y-2 text-sm">
+          <div class="flex gap-3">
+            {% for z in bazi_kongwang.kong_zhi %}
+            <span class="px-3 py-1 rounded-full bg-white/5 text-white/60 font-mono">{{ z }}空</span>
+            {% endfor %}
+          </div>
+          {% if bazi_kongwang.pillars_in_kong %}
+          <div class="mt-3 space-y-2">
+            {% for label, info in bazi_kongwang.pillars_in_kong.items() %}
+            <div class="flex items-start gap-2">
+              <span class="text-rose-400/80 text-xs mt-0.5">⚠</span>
+              <div>
+                <span class="text-white/70 font-semibold">{{ label }}落空亡</span>
+                <span class="text-white/40 text-xs ml-2">{{ info.meaning }}</span>
+              </div>
+            </div>
+            {% endfor %}
+          </div>
+          <p class="text-xs text-white/40 leading-relaxed pt-1">空亡之地支能量虛化，相關生命領域需後天努力彌補，逢沖可解空。</p>
+          {% else %}
+          <p class="text-xs text-white/50 leading-relaxed">四柱均未落空亡，命局較為圓滿。</p>
+          {% endif %}
+        </div>
+      </div>
+      {% endif %}
+
+      {% if bazi_liunian or bazi_liuyue %}
+      <div class="card-glass rounded-2xl p-6">
+        <div class="flex items-center gap-2 mb-4">
+          <span class="text-lg">🌀</span>
+          <h3 class="font-bold text-white/90">流年流月</h3>
+        </div>
+        <div class="space-y-3 text-sm">
+          {% if bazi_liunian %}
+          <div class="border-b border-white/5 pb-3">
+            <div class="flex items-center justify-between mb-1">
+              <span class="text-white/50">{{ bazi_liunian.year }}流年</span>
+              <span class="serif font-bold text-amber-300">{{ bazi_liunian.pillar }} · {{ bazi_liunian.shishen }}</span>
+            </div>
+            <p class="text-xs text-white/50 leading-relaxed">{{ bazi_liunian.desc }}</p>
+            {% if bazi_liunian.zhi_interactions %}
+            <div class="mt-2 space-y-1">
+              {% for iact in bazi_liunian.zhi_interactions %}
+              <p class="text-[10px] text-amber-400/70">↳ {{ iact }}</p>
+              {% endfor %}
+            </div>
+            {% endif %}
+          </div>
+          {% endif %}
+          {% if bazi_liuyue %}
+          <div>
+            <div class="flex items-center justify-between mb-1">
+              <span class="text-white/50">{{ bazi_liuyue.month }}月流月</span>
+              <span class="font-bold text-sky-300">{{ bazi_liuyue.pillar }} · {{ bazi_liuyue.shishen }}</span>
+            </div>
+            <p class="text-xs text-white/50 leading-relaxed">{{ bazi_liuyue.desc }}</p>
+          </div>
+          {% endif %}
+        </div>
+      </div>
+      {% endif %}
+
+    </div>
+  </div>
+</section>
+
+<!-- ══ 健康體質分析 ══ -->
+{% if health_profile %}
+<section class="px-6 py-12">
+  <div class="max-w-3xl mx-auto">
+    <h2 class="text-lg font-semibold text-emerald-400 tracking-widest uppercase mb-8 flex items-center gap-2">
+      <span class="w-6 h-px bg-emerald-400/50"></span>健康體質分析<span class="w-6 h-px bg-emerald-400/50"></span>
+    </h2>
+
+    <!-- 日主體質 -->
+    <div class="rounded-2xl bg-white/5 border border-emerald-500/20 p-6 mb-6">
+      <div class="flex items-start gap-4">
+        <div class="w-10 h-10 rounded-xl bg-emerald-500/20 flex items-center justify-center flex-shrink-0 text-xl">🌿</div>
+        <div>
+          <div class="text-emerald-300 font-semibold mb-1">{{ health_profile.dm_constitution.type }}</div>
+          <div class="text-white/70 text-sm leading-relaxed">{{ health_profile.dm_constitution.desc }}</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 警示 -->
+    {% if health_profile.warnings %}
+    <div class="rounded-2xl bg-amber-500/10 border border-amber-500/20 p-5 mb-6">
+      <div class="text-amber-400 text-xs tracking-widest uppercase mb-3">需要留意</div>
+      {% for w in health_profile.warnings %}
+      <div class="flex items-start gap-2 mb-2">
+        <span class="text-amber-400 mt-0.5 flex-shrink-0">▸</span>
+        <span class="text-white/70 text-sm">{{ w }}</span>
+      </div>
+      {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- 命缺五行 → 偏弱臟腑 -->
+    {% if health_profile.weak_organs %}
+    <div class="mb-6">
+      <div class="text-white/50 text-xs tracking-widest uppercase mb-3">命缺五行・偏弱臟腑</div>
+      <div class="grid grid-cols-1 md:grid-cols-{{ health_profile.weak_organs|length }} gap-4">
+        {% for organ in health_profile.weak_organs %}
+        <div class="rounded-2xl bg-white/5 border border-rose-500/20 p-5">
+          <div class="flex items-center gap-2 mb-2">
+            <span class="text-xs px-2 py-0.5 rounded-full bg-rose-500/20 text-rose-300">缺{{ organ.wx }}</span>
+            <span class="text-white font-medium text-sm">{{ organ.zangfu }}</span>
+          </div>
+          <div class="text-white/40 text-xs mb-2">{{ organ.system }}</div>
+          {% for s in organ.symptoms %}
+          <div class="text-white/60 text-xs mb-1">· {{ s }}</div>
+          {% endfor %}
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+    {% endif %}
+
+    <!-- 忌神臟腑 → 不可過勞 -->
+    {% if health_profile.overload_organs %}
+    <div class="mb-6">
+      <div class="text-white/50 text-xs tracking-widest uppercase mb-3">偏旺臟腑・注意過勞</div>
+      <div class="flex flex-wrap gap-3">
+        {% for organ in health_profile.overload_organs %}
+        <div class="rounded-xl bg-orange-500/10 border border-orange-500/20 px-4 py-3">
+          <div class="flex items-center gap-2 mb-1">
+            <span class="text-xs px-2 py-0.5 rounded-full bg-orange-500/20 text-orange-300">{{ organ.wx }}旺</span>
+            <span class="text-white/80 text-sm font-medium">{{ organ.zangfu }}</span>
+          </div>
+          {% for s in organ.symptoms %}
+          <div class="text-white/50 text-xs">· {{ s }}</div>
+          {% endfor %}
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+    {% endif %}
+
+    <!-- 運動 + 飲食 -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+      <!-- 適合運動 -->
+      <div class="rounded-2xl bg-white/5 border border-sky-500/20 p-5">
+        <div class="text-sky-400 text-xs tracking-widest uppercase mb-3">適合運動</div>
+        {% for ex in health_profile.exercise.good[:4] %}
+        <div class="flex items-center gap-2 mb-1.5">
+          <span class="w-1.5 h-1.5 rounded-full bg-sky-400 flex-shrink-0"></span>
+          <span class="text-white/80 text-sm">{{ ex }}</span>
+        </div>
+        {% endfor %}
+        {% if health_profile.exercise.note %}
+        <div class="mt-3 text-white/40 text-xs">{{ health_profile.exercise.note }}</div>
+        {% endif %}
+        {% if health_profile.exercise.avoid %}
+        <div class="mt-3 pt-3 border-t border-white/10">
+          <div class="text-rose-400/70 text-xs mb-1">避開</div>
+          {% for ex in health_profile.exercise.avoid[:2] %}
+          <div class="text-white/40 text-xs">· {{ ex }}</div>
+          {% endfor %}
+        </div>
+        {% endif %}
+      </div>
+
+      <!-- 飲食建議 -->
+      <div class="rounded-2xl bg-white/5 border border-teal-500/20 p-5">
+        <div class="text-teal-400 text-xs tracking-widest uppercase mb-3">飲食建議</div>
+        {% if health_profile.diet_primary.good_foods %}
+          {% for f in health_profile.diet_primary.good_foods[:3] %}
+          <div class="flex items-center gap-2 mb-1.5">
+            <span class="w-1.5 h-1.5 rounded-full bg-teal-400 flex-shrink-0"></span>
+            <span class="text-white/80 text-sm">{{ f }}</span>
+          </div>
+          {% endfor %}
+        {% endif %}
+        {% if health_profile.diet_primary.good_taste %}
+        <div class="mt-2 text-xs px-2 py-1 rounded-full bg-teal-500/20 text-teal-300 inline-block">喜味：{{ health_profile.diet_primary.good_taste }}</div>
+        {% endif %}
+        {% if health_profile.diet_primary.avoid_foods %}
+        <div class="mt-3 pt-3 border-t border-white/10">
+          <div class="text-rose-400/70 text-xs mb-1">少吃</div>
+          {% for f in health_profile.diet_primary.avoid_foods[:2] %}
+          <div class="text-white/40 text-xs">· {{ f }}</div>
+          {% endfor %}
+        </div>
+        {% endif %}
+        {% if health_profile.diet_primary.tip %}
+        <div class="mt-2 text-amber-400/60 text-xs">{{ health_profile.diet_primary.tip }}</div>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- 補缺飲食 -->
+    {% if health_profile.supplement_foods %}
+    <div class="rounded-2xl bg-white/5 border border-violet-500/20 p-5">
+      <div class="text-violet-400 text-xs tracking-widest uppercase mb-3">補缺飲食（命缺五行的補養方向）</div>
+      {% for s in health_profile.supplement_foods %}
+      <div class="mb-4 last:mb-0">
+        <div class="flex items-center gap-2 mb-2">
+          <span class="text-xs px-2 py-0.5 rounded-full bg-violet-500/20 text-violet-300">補{{ s.wx }}・養{{ s.zangfu }}</span>
+        </div>
+        <div class="flex flex-wrap gap-2">
+          {% for f in s.foods %}
+          <span class="text-xs px-2 py-1 rounded-full bg-white/5 text-white/70">{{ f }}</span>
+          {% endfor %}
+        </div>
+        {% if s.tip %}<div class="text-white/40 text-xs mt-1">{{ s.tip }}</div>{% endif %}
+      </div>
+      {% endfor %}
+    </div>
+    {% endif %}
+
+  </div>
+</section>
+{% endif %}
+
+<!-- ══ 旅遊體質推薦 ══ -->
+{% if travel_profile %}
+<section class="px-6 py-12">
+  <div class="max-w-3xl mx-auto">
+    <h2 class="text-lg font-semibold text-amber-400 tracking-widest uppercase mb-8 flex items-center gap-2">
+      <span class="w-6 h-px bg-amber-400/50"></span>旅遊體質分析<span class="w-6 h-px bg-amber-400/50"></span>
+    </h2>
+
+    <!-- 體質標籤 -->
+    <div class="rounded-2xl bg-white/5 border border-white/10 p-6 mb-6">
+      <div class="flex items-start gap-4">
+        <div class="w-12 h-12 rounded-xl bg-amber-500/20 flex items-center justify-center flex-shrink-0 text-2xl">
+          {% if travel_profile.primary_wx == '水' %}🌊
+          {% elif travel_profile.primary_wx == '火' %}☀️
+          {% elif travel_profile.primary_wx == '木' %}🌿
+          {% elif travel_profile.primary_wx == '金' %}🏔️
+          {% else %}🌏{% endif %}
+        </div>
+        <div>
+          <div class="text-amber-300 font-semibold text-base mb-1">{{ travel_profile.constitution.label }}</div>
+          <div class="text-white/70 text-sm leading-relaxed">{{ travel_profile.constitution.traits }}</div>
+          <div class="mt-2 flex flex-wrap gap-2">
+            <span class="text-xs px-2 py-1 rounded-full bg-sky-500/20 text-sky-300">適合氣候：{{ travel_profile.constitution.climate }}</span>
+            <span class="text-xs px-2 py-1 rounded-full bg-rose-500/20 text-rose-300">避開：{{ travel_profile.constitution.avoid }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 喜用神 + 季節 -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+      <!-- 最佳季節 -->
+      <div class="rounded-2xl bg-white/5 border border-emerald-500/20 p-5">
+        <div class="text-emerald-400 text-xs tracking-widest uppercase mb-3">最佳出遊季節</div>
+        {% for s in travel_profile.best_seasons %}
+        <div class="flex items-center gap-2 mb-2">
+          <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+          <span class="text-white/80 text-sm">{{ s }}</span>
+        </div>
+        {% endfor %}
+        <div class="mt-3 text-white/40 text-xs">喜用神：{{ travel_profile.xiyong | join('、') }}行</div>
+      </div>
+      <!-- 避開季節 -->
+      <div class="rounded-2xl bg-white/5 border border-rose-500/20 p-5">
+        <div class="text-rose-400 text-xs tracking-widest uppercase mb-3">較消耗能量的季節</div>
+        {% if travel_profile.avoid_seasons %}
+          {% for s in travel_profile.avoid_seasons %}
+          <div class="flex items-center gap-2 mb-2">
+            <span class="w-1.5 h-1.5 rounded-full bg-rose-400"></span>
+            <span class="text-white/80 text-sm">{{ s }}</span>
+          </div>
+          {% endfor %}
+        {% else %}
+          <div class="text-white/40 text-sm">無特定忌避季節</div>
+        {% endif %}
+        {% if travel_profile.jishen %}
+        <div class="mt-3 text-white/40 text-xs">忌神：{{ travel_profile.jishen | join('、') }}行</div>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- 旅遊風格（兩層） -->
+    <div class="rounded-2xl bg-white/5 border border-violet-500/20 p-5 mb-6">
+      <div class="text-violet-400 text-xs tracking-widest uppercase mb-3">旅遊風格</div>
+
+      {% if travel_profile.combo_label %}
+      <div class="text-lg font-semibold text-white mb-3">【{{ travel_profile.combo_label }}】</div>
+      {% endif %}
+
+      <!-- 層一：去哪裡（環境偏好） -->
+      <div class="mb-4 pb-4 border-b border-white/10">
+        <div class="text-white/40 text-xs mb-1">層一・環境偏好（喜用神決定）</div>
+        <div class="flex flex-wrap items-center gap-2 mb-1">
+          <span class="text-white/80 font-medium text-sm">{{ travel_profile.style.type }}</span>
+          <span class="text-xs px-2 py-0.5 rounded-full bg-violet-500/20 text-violet-300">{{ travel_profile.style.pace }}</span>
+        </div>
+        <div class="text-white/60 text-sm">{{ travel_profile.style.prefer }}</div>
+        {% if travel_profile.style.note %}
+        <div class="text-amber-400/70 text-xs mt-1">{{ travel_profile.style.note }}</div>
+        {% endif %}
+      </div>
+
+      <!-- 層二：怎麼玩（日主行程風格） -->
+      {% if travel_profile.itinerary %}
+      <div>
+        <div class="text-white/40 text-xs mb-1">層二・行程風格（日主個性決定）</div>
+        <div class="flex flex-wrap items-center gap-2 mb-1">
+          <span class="text-white/80 font-medium text-sm">{{ travel_profile.itinerary.itinerary_type }}</span>
+          <span class="text-xs px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300">{{ travel_profile.itinerary.itinerary_pace }}</span>
+        </div>
+        <div class="text-white/60 text-sm mb-1">{{ travel_profile.itinerary.itinerary_desc }}</div>
+        <div class="text-white/40 text-xs italic">「{{ travel_profile.itinerary.tag }}」</div>
+      </div>
+      {% endif %}
+    </div>
+
+    <!-- 推薦目的地 -->
+    <div class="rounded-2xl bg-white/5 border border-white/10 p-5 mb-6">
+      <div class="text-amber-400 text-xs tracking-widest uppercase mb-3">推薦目的地</div>
+      <div class="flex flex-wrap gap-2 mb-3">
+        {% for d in travel_profile.top_destinations %}
+        <span class="text-sm px-3 py-1 rounded-full bg-amber-500/15 text-amber-200 border border-amber-500/20">{{ d }}</span>
+        {% endfor %}
+      </div>
+      {% if travel_profile.secondary_dest %}
+      <div class="flex flex-wrap gap-2 mb-3">
+        {% for d in travel_profile.secondary_dest %}
+        <span class="text-sm px-3 py-1 rounded-full bg-white/5 text-white/60 border border-white/10">{{ d }}</span>
+        {% endfor %}
+      </div>
+      {% endif %}
+      {% if travel_profile.dest_note %}
+      <div class="text-white/50 text-xs mt-1">{{ travel_profile.dest_note }}</div>
+      {% endif %}
+
+      <!-- 推薦環境標籤 -->
+      <div class="mt-4 pt-4 border-t border-white/10">
+        <div class="text-white/40 text-xs mb-2">適合地景</div>
+        <div class="flex flex-wrap gap-2">
+          {% for env in travel_profile.environments %}
+          <span class="text-xs px-2 py-1 rounded-full bg-sky-500/10 text-sky-300/80">{{ env }}</span>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+
+    <!-- 郵輪 + 極光 -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <!-- 郵輪 -->
+      <div class="rounded-2xl bg-white/5 border border-sky-500/20 p-5">
+        <div class="text-sky-400 text-xs tracking-widest uppercase mb-2">郵輪適合嗎？</div>
+        {% if travel_profile.cruise_rec %}
+        <div class="flex items-center gap-2 mb-1">
+          <span class="text-emerald-400 text-sm">✦ 推薦</span>
+        </div>
+        <div class="text-white/70 text-sm">{{ travel_profile.cruise_rec }}</div>
+        {% else %}
+        <div class="text-white/50 text-sm">非首選，陸地型旅行更充電</div>
+        {% endif %}
+        {% if travel_profile.primary_wx == '水' or travel_profile.primary_wx == '火' %}
+        <div class="mt-2 text-white/40 text-xs">
+          {% if travel_profile.primary_wx == '水' %}喜水體質天然適合郵輪海洋環境
+          {% else %}火調型在海上可獲得水的平衡，降低過旺的燥感{% endif %}
+        </div>
+        {% endif %}
+      </div>
+      <!-- 極光 -->
+      <div class="rounded-2xl bg-white/5 border border-indigo-500/20 p-5">
+        <div class="text-indigo-400 text-xs tracking-widest uppercase mb-2">看極光適合嗎？</div>
+        <div class="flex items-center gap-2 mb-1">
+          <span class="text-sm
+            {% if travel_profile.aurora_fit == '非常適合' %}text-emerald-400
+            {% elif travel_profile.aurora_fit == '適合' %}text-sky-400
+            {% elif travel_profile.aurora_fit == '尚可' %}text-amber-400
+            {% else %}text-rose-400{% endif %}">
+            {{ travel_profile.aurora_fit }}
+          </span>
+        </div>
+        <div class="text-white/60 text-xs leading-relaxed">{{ travel_profile.aurora_note }}</div>
+      </div>
+    </div>
+
+  </div>
+</section>
+{% endif %}
+
 <!-- Paywall -->
 <section class="px-6 py-8 relative">
   <div class="max-w-3xl mx-auto relative">
@@ -426,6 +994,156 @@
       <div class="text-center py-8">
         <p class="serif text-xl text-white/60 italic">「{{ portrait.life_topic }}」</p>
       </div>
+
+      <!-- Cross Insights -->
+      {% if portrait.cross_insights %}
+      <div class="card-glass rounded-2xl p-6 mb-8">
+        <h3 class="font-bold text-white/90 mb-4">🔍 跨系統整合洞察</h3>
+        <div class="space-y-2">
+          {% for line in portrait.cross_insights %}
+          <p class="text-sm text-white/60 leading-relaxed">{{ line }}</p>
+          {% endfor %}
+        </div>
+      </div>
+      {% endif %}
+
+      <!-- Three-layer Sihua Map -->
+      {% if sihua_map %}
+      <div class="card-gold rounded-2xl p-6 mb-8">
+        <h3 class="font-bold text-amber-400 mb-1">☯ 三層四化宮位地圖</h3>
+        <p class="text-xs text-white/30 mb-5">本命 + 大限 + 流年四化聚焦分析，intensity≥2 的宮位是今年最需關注的核心</p>
+        <div class="space-y-3">
+          {% for palace, info in sihua_map.items() %}
+          {% if info.intensity >= 2 %}
+          <div class="flex items-start gap-3 p-3 rounded-xl {% if info.has_lu and info.has_ji %}bg-purple-500/10{% elif info.has_lu %}bg-amber-500/10{% elif info.has_ji %}bg-red-500/10{% else %}bg-white/5{% endif %}">
+            <span class="text-sm font-bold whitespace-nowrap {% if info.has_lu and info.has_ji %}text-purple-300{% elif info.has_lu %}text-amber-300{% elif info.has_ji %}text-red-300{% else %}text-white/60{% endif %}">{{ palace }}</span>
+            <div class="flex-1 min-w-0">
+              <p class="text-xs text-white/70 mb-1.5">{{ info.summary }}</p>
+              <div class="flex flex-wrap gap-1">
+                {% for layer in info.layers %}
+                <span class="text-[10px] px-1.5 py-0.5 rounded bg-white/10 text-white/50">{{ layer }}</span>
+                {% endfor %}
+              </div>
+            </div>
+            <span class="text-[10px] text-white/25 whitespace-nowrap">×{{ info.intensity }}</span>
+          </div>
+          {% endif %}
+          {% endfor %}
+        </div>
+      </div>
+      {% endif %}
+
+      <!-- Daxian Sihua -->
+      {% if ziwei_daxian_sihua and ziwei_daxian_sihua.sihua %}
+      <div class="card-glass rounded-2xl p-6 mb-8">
+        <h3 class="font-bold text-white/90 mb-1">🔯 大限四化（本10年主題）</h3>
+        <p class="text-xs text-white/30 mb-4">大限天干 {{ ziwei_daxian_sihua.daxian_gan }}，決定這10年哪些宮位最活躍</p>
+        <div class="grid grid-cols-2 gap-3">
+          {% for hua_type in ['祿', '權', '科', '忌'] %}
+          {% if hua_type in ziwei_daxian_sihua.sihua %}
+          {% set item = ziwei_daxian_sihua.sihua[hua_type] %}
+          <div class="p-3 rounded-xl {% if hua_type == '祿' %}bg-amber-500/10 border border-amber-500/20{% elif hua_type == '科' %}bg-sky-500/10 border border-sky-500/20{% elif hua_type == '忌' %}bg-red-500/10 border border-red-500/20{% else %}bg-white/5{% endif %}">
+            <div class="flex items-center gap-1.5 mb-1">
+              <span class="text-xs font-bold {% if hua_type == '祿' %}text-amber-300{% elif hua_type == '科' %}text-sky-300{% elif hua_type == '忌' %}text-red-300{% else %}text-blue-300{% endif %}">化{{ hua_type }}</span>
+              <span class="text-xs text-white/60">{{ item.star }}</span>
+            </div>
+            <p class="text-xs text-white/50">→ {{ item.palace }}</p>
+          </div>
+          {% endif %}
+          {% endfor %}
+        </div>
+      </div>
+      {% endif %}
+
+      <!-- Incarnation Cross -->
+      {% if hd_incarnation_cross %}
+      <div class="card-glass rounded-2xl p-6 mb-8">
+        <h3 class="font-bold text-white/90 mb-4">🌐 業力十字（人生使命）</h3>
+        <div class="text-center mb-5">
+          <span class="serif text-xl font-bold text-amber-300">{{ hd_incarnation_cross.cross_type }}</span>
+          <p class="text-sm text-white/50 mt-2 leading-relaxed">{{ hd_incarnation_cross.cross_desc }}</p>
+        </div>
+        <div class="grid grid-cols-2 gap-3 text-sm">
+          <div class="p-3 rounded-xl bg-white/5">
+            <p class="text-[10px] text-white/30 mb-1">意識太陽</p>
+            <p class="font-bold text-amber-300">閘門 {{ hd_incarnation_cross.p_sun.gate }}</p>
+            <p class="text-xs text-white/50">{{ hd_incarnation_cross.p_sun.theme }}</p>
+          </div>
+          <div class="p-3 rounded-xl bg-white/5">
+            <p class="text-[10px] text-white/30 mb-1">意識地球</p>
+            <p class="font-bold text-white/80">閘門 {{ hd_incarnation_cross.p_earth.gate }}</p>
+            <p class="text-xs text-white/50">{{ hd_incarnation_cross.p_earth.theme }}</p>
+          </div>
+          <div class="p-3 rounded-xl bg-white/5">
+            <p class="text-[10px] text-white/30 mb-1">潛意識太陽</p>
+            <p class="font-bold text-purple-300">閘門 {{ hd_incarnation_cross.d_sun.gate }}</p>
+            <p class="text-xs text-white/50">{{ hd_incarnation_cross.d_sun.theme }}</p>
+          </div>
+          <div class="p-3 rounded-xl bg-white/5">
+            <p class="text-[10px] text-white/30 mb-1">潛意識地球</p>
+            <p class="font-bold text-white/60">閘門 {{ hd_incarnation_cross.d_earth.gate }}</p>
+            <p class="text-xs text-white/50">{{ hd_incarnation_cross.d_earth.theme }}</p>
+          </div>
+        </div>
+      </div>
+      {% endif %}
+
+      <!-- Channel Themes -->
+      {% if hd_channel_themes %}
+      <div class="card-glass rounded-2xl p-6 mb-8">
+        <h3 class="font-bold text-white/90 mb-4">⚡ 激活通道主題</h3>
+        <div class="space-y-3">
+          {% for ch in hd_channel_themes %}
+          <div class="flex items-start gap-3 p-3 rounded-xl bg-amber-500/5 border border-amber-500/10">
+            <span class="text-xs font-mono text-amber-500/50 whitespace-nowrap mt-0.5">{{ ch.gates[0] }}-{{ ch.gates[1] }}</span>
+            <div>
+              <p class="text-sm font-bold text-amber-300">{{ ch.name }}</p>
+              <p class="text-xs text-white/50 mt-0.5 leading-relaxed">{{ ch.desc }}</p>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+      {% endif %}
+
+      <!-- Open Center Analysis -->
+      {% if hd_open_centers %}
+      <div class="card-glass rounded-2xl p-6 mb-8">
+        <h3 class="font-bold text-white/90 mb-2">🔓 開放中心制約模式</h3>
+        <p class="text-xs text-white/30 mb-5">開放中心是你最容易被外界制約之處，也是最大的成長空間</p>
+        <div class="space-y-4">
+          {% for oc in hd_open_centers %}
+          <div class="border-b border-white/5 pb-4 last:border-0 last:pb-0">
+            <p class="text-sm font-bold text-white/80 mb-2.5">{{ oc.center }}中心（開放）</p>
+            <div class="space-y-1.5 pl-2">
+              <p class="text-xs text-red-300/80">⚠ {{ oc.challenge }}</p>
+              <p class="text-xs text-emerald-300/80">✨ {{ oc.gift }}</p>
+              <p class="text-xs text-amber-300/80">💡 {{ oc.tip }}</p>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+      {% endif %}
+
+      <!-- Astro Aspects -->
+      {% if astro_aspects %}
+      <div class="card-glass rounded-2xl p-6 mb-8">
+        <h3 class="font-bold text-white/90 mb-4">✨ 強力占星相位（≤3°）</h3>
+        <div class="space-y-2">
+          {% for a in astro_aspects %}
+          {% if a.orb <= 3.0 %}
+          <div class="flex items-center gap-3 py-1.5 border-b border-white/5 last:border-0">
+            <span class="text-[10px] px-2 py-0.5 rounded-full whitespace-nowrap {% if a.polarity == 'positive' %}bg-emerald-500/20 text-emerald-300{% else %}bg-red-500/20 text-red-300{% endif %}">{{ a.aspect }}</span>
+            <p class="text-xs text-white/60 flex-1 leading-relaxed">{{ a.desc }}</p>
+            <span class="text-[10px] text-white/25">{{ a.orb }}°</span>
+          </div>
+          {% endif %}
+          {% endfor %}
+        </div>
+      </div>
+      {% endif %}
+
     </div>
 
     <!-- Paywall Overlay -->
@@ -456,6 +1174,50 @@
   <p class="text-white/20 text-xs">Family Destiny · 五系統命理解讀 · 不是算命，是自我理解</p>
   <p class="text-white/10 text-[10px] mt-2">本報告僅供參考，請理性看待</p>
 </footer>
+
+<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+<script>
+async function downloadCard() {
+  const card  = document.getElementById('destiny-card');
+  const btn   = document.getElementById('download-btn');
+  const orig  = btn.innerHTML;
+  btn.innerHTML = '⏳ 生成中…';
+  btn.disabled = true;
+
+  try {
+    await document.fonts.ready;
+    const canvas = await html2canvas(card, {
+      scale: 3,
+      useCORS: true,
+      allowTaint: true,
+      backgroundColor: null,
+      logging: false,
+      imageTimeout: 15000,
+    });
+    const link = document.createElement('a');
+    link.download = '命運名片_{{ name }}.png';
+    link.href = canvas.toDataURL('image/png');
+    link.click();
+    btn.innerHTML = '✓ 已儲存';
+    setTimeout(() => { btn.innerHTML = orig; btn.disabled = false; }, 2000);
+  } catch (e) {
+    alert('圖片生成失敗，請直接截圖儲存。');
+    btn.innerHTML = orig;
+    btn.disabled = false;
+  }
+}
+
+function copyLink() {
+  const btn = document.getElementById('copy-btn');
+  const orig = btn.innerHTML;
+  navigator.clipboard.writeText(window.location.href).then(() => {
+    btn.textContent = '✓ 已複製';
+    setTimeout(() => { btn.innerHTML = orig; }, 2000);
+  }).catch(() => {
+    prompt('複製此連結：', window.location.href);
+  });
+}
+</script>
 
 </body>
 </html>

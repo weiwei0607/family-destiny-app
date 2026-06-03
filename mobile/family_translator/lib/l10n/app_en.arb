@@ -50,5 +50,7 @@
   "comingSoon": "Coming soon",
   "free": "Free",
   "premium": "Premium",
-  "notFortuneTelling": "Not fortune telling, but self-understanding + relationship translation"
+  "notFortuneTelling": "Not fortune telling, but self-understanding + relationship translation",
+  "annualMode": "📅 Annual Fortune",
+  "annualModeSubtitle": "View this year's fortune flow and monthly highlights"
 }

@@ -1,5 +1,8 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import '../models/chart_model.dart';
+import '../providers/ad_provider.dart';
 import '../services/api_service.dart';
 
 class AnnualScreen extends StatefulWidget {
@@ -28,6 +31,15 @@ class _AnnualScreenState extends State<AnnualScreen> {
       return;
     }
 
+    // Check premium access before hitting the endpoint
+    final adProvider = context.read<AdProvider>();
+    adProvider.checkExpiry();
+    if (!ApiService().isPremium && !adProvider.isPremiumUnlocked) {
+      if (mounted) _showPaywall();
+      return;
+    }
+    if (adProvider.isPremiumUnlocked) ApiService().isPremium = true;
+
     setState(() => _loading = true);
 
     try {
@@ -47,10 +59,91 @@ class _AnnualScreenState extends State<AnnualScreen> {
       });
     } catch (e) {
       setState(() => _loading = false);
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('生成失敗: $e')),
-      );
+      if (e.toString().contains('PREMIUM_REQUIRED')) {
+        if (mounted) _showPaywall();
+      } else {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('生成失敗: $e')),
+          );
+        }
+      }
     }
+  }
+
+  void _showPaywall() {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (ctx) => Container(
+        decoration: const BoxDecoration(
+          color: Color(0xFF1E1E2E),
+          borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+        ),
+        padding: const EdgeInsets.all(24),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            const Icon(Icons.auto_awesome, size: 48, color: Colors.amber),
+            const SizedBox(height: 16),
+            const Text(
+              '年度運勢需要 Premium',
+              textAlign: TextAlign.center,
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.white),
+            ),
+            const SizedBox(height: 8),
+            const Text(
+              'AI 結合五個系統分析整年運勢，屬於付費功能',
+              textAlign: TextAlign.center,
+              style: TextStyle(color: Colors.white60),
+            ),
+            const SizedBox(height: 24),
+            OutlinedButton.icon(
+              onPressed: () async {
+                Navigator.pop(ctx);
+                final adProvider = context.read<AdProvider>();
+                await adProvider.watchAdToUnlock(unlockDuration: const Duration(hours: 1));
+                if (!mounted) return;
+                if (adProvider.isPremiumUnlocked) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text('✅ 已解鎖 ${adProvider.timeRemaining}'),
+                      backgroundColor: Colors.green,
+                    ),
+                  );
+                  _generateReport();
+                }
+              },
+              icon: const Icon(Icons.play_circle_outline, color: Colors.amber),
+              label: const Text('看廣告免費解鎖 1 小時', style: TextStyle(color: Colors.amber)),
+              style: OutlinedButton.styleFrom(
+                side: const BorderSide(color: Colors.amber),
+                padding: const EdgeInsets.symmetric(vertical: 14),
+              ),
+            ),
+            if (kDebugMode) ...[
+              const SizedBox(height: 12),
+              ElevatedButton(
+                onPressed: () {
+                  ApiService().isPremium = true;
+                  Navigator.pop(ctx);
+                  _generateReport();
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFF667EEA),
+                  foregroundColor: Colors.white,
+                  padding: const EdgeInsets.symmetric(vertical: 14),
+                ),
+                child: const Text('💎 開發者繞過付費牆'),
+              ),
+            ],
+            const SizedBox(height: 24),
+          ],
+        ),
+      ),
+    );
   }
 
   @override

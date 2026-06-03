@@ -289,9 +289,9 @@ class _AskScreenState extends State<AskScreen> {
                     Container(
                       padding: const EdgeInsets.all(10),
                       decoration: BoxDecoration(
-                        color: Colors.amber.withOpacity(0.08),
+                        color: Colors.amber.withValues(alpha: 0.08),
                         borderRadius: BorderRadius.circular(8),
-                        border: Border.all(color: Colors.amber.withOpacity(0.2)),
+                        border: Border.all(color: Colors.amber.withValues(alpha: 0.2)),
                       ),
                       child: Row(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -341,7 +341,7 @@ class _AskScreenState extends State<AskScreen> {
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
         color: const Color(0xFF0F0F1A),
-        border: Border(top: BorderSide(color: Colors.white.withOpacity(0.08))),
+        border: Border(top: BorderSide(color: Colors.white.withValues(alpha: 0.08))),
       ),
       child: SafeArea(
         child: Row(
@@ -355,7 +355,7 @@ class _AskScreenState extends State<AskScreen> {
                 onSubmitted: (value) => _sendQuestion(value),
                 decoration: InputDecoration(
                   hintText: '輸入你的問題...',
-                  hintStyle: TextStyle(color: Colors.white.withOpacity(0.3)),
+                  hintStyle: TextStyle(color: Colors.white.withValues(alpha: 0.3)),
                   filled: true,
                   fillColor: const Color(0xFF1E1E2E),
                   border: OutlineInputBorder(

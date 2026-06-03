@@ -23,8 +23,7 @@ class ProfileOut(BaseModel):
     chart_data: Optional[Dict[str, Any]] = None
     created_at: datetime
     
-    class Config:
-        from_attributes = True
+    model_config = {"from_attributes": True}
 
 # ---------- Chart Schemas ----------
 
@@ -86,8 +85,7 @@ class UserOut(BaseModel):
     premium_expires_at: Optional[datetime]
     created_at: datetime
     
-    class Config:
-        from_attributes = True
+    model_config = {"from_attributes": True}
 
 # ---------- RevenueCat Webhook ----------
 

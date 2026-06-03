@@ -405,6 +405,18 @@ abstract class AppLocalizations {
   /// In zh_TW, this message translates to:
   /// **'不是算命，是「自我理解 + 關係翻譯」'**
   String get notFortuneTelling;
+
+  /// No description provided for @annualMode.
+  ///
+  /// In zh_TW, this message translates to:
+  /// **'📅 年度運勢'**
+  String get annualMode;
+
+  /// No description provided for @annualModeSubtitle.
+  ///
+  /// In zh_TW, this message translates to:
+  /// **'查看這一年的運勢走向與每月重點'**
+  String get annualModeSubtitle;
 }
 
 class _AppLocalizationsDelegate

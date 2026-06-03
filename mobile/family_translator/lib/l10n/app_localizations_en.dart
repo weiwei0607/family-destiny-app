@@ -164,4 +164,11 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get notFortuneTelling =>
       'Not fortune telling, but self-understanding + relationship translation';
+
+  @override
+  String get annualMode => '📅 Annual Fortune';
+
+  @override
+  String get annualModeSubtitle =>
+      'View this year\'s fortune flow and monthly highlights';
 }

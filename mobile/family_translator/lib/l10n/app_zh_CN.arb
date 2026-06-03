@@ -50,5 +50,7 @@
   "comingSoon": "即将推出",
   "free": "免费",
   "premium": "付费",
-  "notFortuneTelling": "不是算命，是「自我理解 + 关系翻译」"
+  "notFortuneTelling": "不是算命，是「自我理解 + 关系翻译」",
+  "annualMode": "📅 年度运势",
+  "annualModeSubtitle": "查看这一年的运势走向与每月重点"
 }

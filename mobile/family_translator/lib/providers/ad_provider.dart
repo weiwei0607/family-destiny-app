@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 import '../services/ad_service.dart';
 
 /// Manages ad-unlocked premium access state
@@ -53,8 +53,8 @@ class AdProvider extends ChangeNotifier {
       },
     );
 
-    // If ad failed to show, still unlock as fallback (dev mode)
-    if (!rewarded) {
+    // Only unlock on ad failure in debug builds
+    if (!rewarded && kDebugMode) {
       _unlockedUntil = DateTime.now().add(unlockDuration);
       _isShowingAd = false;
       notifyListeners();

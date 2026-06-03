@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../models/chart_model.dart';
@@ -93,6 +94,7 @@ class _PersonalReportScreenState extends State<PersonalReportScreen>
       });
     } catch (e) {
       setState(() => _loadingPremium = false);
+      if (!mounted) return;
       if (e.toString().contains('PREMIUM_REQUIRED')) {
         _showPaywall();
       } else {
@@ -176,6 +178,7 @@ class _PersonalReportScreenState extends State<PersonalReportScreen>
                 Navigator.pop(context);
                 final adProvider = context.read<AdProvider>();
                 await adProvider.watchAdToUnlock(unlockDuration: const Duration(hours: 1));
+                if (!context.mounted) return;
                 if (adProvider.isPremiumUnlocked) {
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
@@ -194,20 +197,22 @@ class _PersonalReportScreenState extends State<PersonalReportScreen>
                 padding: const EdgeInsets.symmetric(vertical: 14),
               ),
             ),
-            const SizedBox(height: 24),
-            ElevatedButton(
-              onPressed: () {
-                ApiService().isPremium = true;
-                Navigator.pop(context);
-                _unlockFullReport(tier: 'premium');
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF667EEA),
-                foregroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(vertical: 16),
+            if (kDebugMode) ...[
+              const SizedBox(height: 24),
+              ElevatedButton(
+                onPressed: () {
+                  ApiService().isPremium = true;
+                  Navigator.pop(context);
+                  _unlockFullReport(tier: 'premium');
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFF667EEA),
+                  foregroundColor: Colors.white,
+                  padding: const EdgeInsets.symmetric(vertical: 16),
+                ),
+                child: const Text('💎 開發者繞過付費牆'),
               ),
-              child: const Text('💎 開發者繞過付費牆'),
-            ),
+            ],
           ],
         ),
       ),
@@ -301,7 +306,31 @@ class _PersonalReportScreenState extends State<PersonalReportScreen>
     if (_error != null) {
       return Scaffold(
         appBar: AppBar(title: const Text('錯誤')),
-        body: Center(child: Text(_error!)),
+        body: Center(
+          child: Padding(
+            padding: const EdgeInsets.all(24),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Icon(Icons.cloud_off, size: 48, color: Colors.grey),
+                const SizedBox(height: 16),
+                Text(_error!, textAlign: TextAlign.center),
+                const SizedBox(height: 24),
+                ElevatedButton.icon(
+                  onPressed: () {
+                    setState(() {
+                      _error = null;
+                      _loadingBasic = true;
+                    });
+                    _loadBasicChart();
+                  },
+                  icon: const Icon(Icons.refresh),
+                  label: const Text('重試'),
+                ),
+              ],
+            ),
+          ),
+        ),
       );
     }
 
@@ -788,9 +817,9 @@ class _PersonalReportScreenState extends State<PersonalReportScreen>
     if (xx.isNotEmpty) fragments.add('$xx宿的保護本能');
 
     if (fragments.length >= 2) {
-      return '你是${fragments.join('、')}的組合。這些特質看似矛盾，卻在同一个人身上共存——這就是為什麼有時候連你自己都搞不清楚自己到底是誰。完整報告會告訴你，這些矛盾如何形成你獨一無二的形狀...';
+      return '你是${fragments.join('、')}的組合。這些特質看似矛盾，卻在同一個人身上共存——這就是為什麼有時候連你自己都搞不清楚自己到底是誰。完整報告會告訴你，這些矛盾如何形成你獨一無二的形狀...';
     }
-    return '你的命盤揭示了多個系統交織的獨特組合。這些特質看似矛盾，卻在同一个人身上共存——完整報告會告訴你，這些矛盾如何形成你獨一無二的形狀...';
+    return '你的命盤揭示了多個系統交織的獨特組合。這些特質看似矛盾，卻在同一個人身上共存——完整報告會告訴你，這些矛盾如何形成你獨一無二的形狀...';
   }
 
   Widget _buildLockedItem({
@@ -1006,7 +1035,7 @@ class _PersonalReportScreenState extends State<PersonalReportScreen>
               e.key,
               '${data['sign']} ${data['degree']}°',
             );
-          }).toList(),
+          }),
         ],
       ),
     );

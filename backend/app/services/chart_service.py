@@ -1,5 +1,6 @@
 """Chart computation service - wraps the destiny engines"""
 from datetime import datetime
+from functools import lru_cache
 from typing import Dict, Any, Optional
 from app.engine import core, ziwei, humandesign, xingxiu, lunar_lookup, interpretations
 
@@ -18,74 +19,57 @@ def _hour_idx(dt: datetime) -> int:
 def _gender_code(g: str) -> str:
     return '男' if g in ('男', 'male', 'M', 'm') else '女'
 
-def compute_basic_chart(data: Dict[str, Any]) -> Dict[str, Any]:
-    """Compute basic chart data (free tier) - pure code, no AI"""
-    dt = datetime.fromisoformat(f"{data['date']}T{data.get('time', '12:00')}")
-    loc_key = data.get('location', 'taipei')
-    lat, lon = _location_coords(loc_key)
-    gender = _gender_code(data.get('gender', '女'))
-    
-    # 1. Bazi
+@lru_cache(maxsize=512)
+def _compute_chart_cached(date: str, time: str, location: str, gender_code: str, lang: str) -> Dict[str, Any]:
+    """Pure astronomical computation, cached by birth data. Name excluded — it doesn't affect results."""
+    dt = datetime.fromisoformat(f"{date}T{time}")
+    lat, lon = _location_coords(location)
+
     bz = core.bazi_pillars(dt)
-    
-    # 2. Astrology (also gives longitudes for HD)
     ast = core.western_astrology(dt, lat, lon)
     planets_longitudes = {k: v['longitude'] for k, v in ast.items()}
-    
-    # 3. Lunar date
+
     lunar = lunar_lookup.get_lunar_date(dt.year, dt.month, dt.day)
     if lunar is None:
         lunar = {
-            'lunar_year': dt.year,
-            'lunar_month': dt.month,
-            'lunar_day': dt.day,
-            'lunar_year_gz': bz['year'],
-            'is_leap_month': False
+            'lunar_year': dt.year, 'lunar_month': dt.month,
+            'lunar_day': dt.day, 'lunar_year_gz': bz['year'], 'is_leap_month': False
         }
-    
-    # 4. Ziwei
+
     try:
-        year_gan = bz['year'][0]
         zw = ziwei.ziwei_chart(
-            year_gan=year_gan,
+            year_gan=bz['year'][0],
             lunar_month=lunar['lunar_month'],
             lunar_day=lunar['lunar_day'],
             hour_idx=_hour_idx(dt),
-            gender=gender
+            gender=gender_code
         )
     except Exception:
         zw = {'命宮': '未知', '身宮': '未知', '五行局': '未知', '紫微': '未知', '天府': '未知', '主星': {}, '輔星': {}, '四化': {}}
-    
-    # 5. Human Design
+
     try:
         hd = humandesign.calculate(planets_longitudes)
     except Exception:
         hd = {'energy_type': '未知', 'profile': '未知', 'authority': '未知', 'defined_gates': [], 'active_channels': [], 'defined_centers': [], 'gate_details': {}}
-    
-    # 6. Xingxiu
+
     try:
         xx = xingxiu.get_xingxiu(lunar['lunar_month'], lunar['lunar_day'])
     except Exception:
         xx = '未知'
-    
-    # Simple energy score
+
     defined_centers = hd.get('defined_centers') or []
     main_stars = zw.get('主星') or {}
     energy_score = min(100, 60 + len(defined_centers) * 5 + len([v for v in main_stars.values() if v]) * 2)
-    
-    # Summary
-    summary_parts = [
+
+    summary = ' · '.join([
         f"{bz['day_master']}日主",
         f"{zw.get('命宮', '未知')}命宮",
         f"{hd.get('energy_type', '未知')}{hd.get('profile', '')}",
         f"{xx}宿"
-    ]
-    summary = ' · '.join(summary_parts)
-    
-    # Build interpretations
+    ])
+
     chart_data = {
-        "name": data.get('name', ''),
-        "gender": gender,
+        "gender": gender_code,
         "bazi": bz,
         "astrology": {k: {"sign": v["sign"], "degree": v["degree"]} for k, v in ast.items()},
         "ziwei": zw,
@@ -93,13 +77,23 @@ def compute_basic_chart(data: Dict[str, Any]) -> Dict[str, Any]:
         "xingxiu": xx,
         "lunar": lunar,
         "energy_score": energy_score,
-        "summary": summary
+        "summary": summary,
     }
-    
-    lang = data.get('lang', 'zh-TW')
     chart_data["interpretations"] = interpretations.build_free_interpretations(chart_data, lang)
-    
     return chart_data
+
+
+def compute_basic_chart(data: Dict[str, Any]) -> Dict[str, Any]:
+    """Compute basic chart data (free tier) - pure code, no AI. Results are cached."""
+    cached = _compute_chart_cached(
+        date=data['date'],
+        time=data.get('time', '12:00'),
+        location=data.get('location', 'taipei'),
+        gender_code=_gender_code(data.get('gender', '女')),
+        lang=data.get('lang', 'zh-TW'),
+    )
+    # Name is injected after cache lookup — it doesn't affect computation
+    return {**cached, "name": data.get('name', '')}
 
 
 def compute_compatibility_basic(data1: Dict[str, Any], data2: Dict[str, Any]) -> Dict[str, Any]:

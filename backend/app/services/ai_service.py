@@ -1,11 +1,31 @@
-"""AI report generation service using OpenAI"""
+"""AI report generation service using Gemini"""
 import json
 from typing import Dict, Any, List
-from openai import AsyncOpenAI
+import google.generativeai as genai
 from app.config import get_settings
 
 settings = get_settings()
-client = AsyncOpenAI(api_key=settings.OPENAI_API_KEY) if settings.OPENAI_API_KEY else None
+if settings.GEMINI_API_KEY:
+    genai.configure(api_key=settings.GEMINI_API_KEY)
+
+_gemini_client = settings.GEMINI_API_KEY  # truthy → configured
+
+
+async def _call_gemini(system: str, prompt: str, max_tokens: int) -> str:
+    """Send a single request to Gemini and return the raw text response."""
+    model = genai.GenerativeModel(
+        settings.GEMINI_MODEL,
+        system_instruction=system,
+    )
+    response = await model.generate_content_async(
+        prompt,
+        generation_config=genai.types.GenerationConfig(
+            temperature=0.8,
+            max_output_tokens=max_tokens,
+            response_mime_type="application/json",
+        ),
+    )
+    return response.text
 
 # ---------- Multi-language prompts ----------
 
@@ -72,7 +92,7 @@ PROMPTS = {
   ]
 }
 """,
-        "fallback_profile": "你是{day_master}日主，{xingxiu}宿，{energy_type}。五個系統共同描繪出一個獨特的你。（請設定 OPENAI_API_KEY 以啟用 AI 報告生成）",
+        "fallback_profile": "你是{day_master}日主，{xingxiu}宿，{energy_type}。五個系統共同描繪出一個獨特的你。（請設定 GEMINI_API_KEY 以啟用 AI 報告生成）",
         "fallback_lessons": "你的課題不是『更努力』，是『允許自己不完美』。",
         "fallback_sw": {
             "外在表現": {"優點": "果斷、有主見", "缺點": "容易被誤解為強勢"},
@@ -88,7 +108,7 @@ PROMPTS = {
             {"icon": "😴", "title": "{{presc4_title}}", "description": "{{presc4_desc}}"},
             {"icon": "🧹", "title": "{{presc5_title}}", "description": "{{presc5_desc}}"}
         ],
-        "fallback_compat_narrative": "你們的基礎合盤分數是{score}分，{summary}。（請設定 OPENAI_API_KEY 以啟用 AI 深度報告）",
+        "fallback_compat_narrative": "你們的基礎合盤分數是{score}分，{summary}。（請設定 GEMINI_API_KEY 以啟用 AI 深度報告）",
         "fallback_conflict": ["當你情緒激動時，對方可能會退縮", "你們對『安全感』的定義不同"],
         "fallback_comm_guide": {
             "當你生氣時": "先深呼吸，給自己 10 分鐘冷靜",
@@ -165,7 +185,7 @@ PROMPTS = {
   ]
 }
 """,
-        "fallback_profile": "你是{day_master}日主，{xingxiu}宿，{energy_type}。五个系统共同描绘出一个独特的你。（请设定 OPENAI_API_KEY 以启用 AI 报告生成）",
+        "fallback_profile": "你是{day_master}日主，{xingxiu}宿，{energy_type}。五个系统共同描绘出一个独特的你。（请设定 GEMINI_API_KEY 以启用 AI 报告生成）",
         "fallback_lessons": "你的课题不是『更努力』，是『允许自己不完美』。",
         "fallback_sw": {
             "外在表现": {"优点": "果断、有主见", "缺点": "容易被误解为强势"},
@@ -181,7 +201,7 @@ PROMPTS = {
             {"icon": "😴", "title": "{{presc4_title}}", "description": "{{presc4_desc}}"},
             {"icon": "🧹", "title": "{{presc5_title}}", "description": "{{presc5_desc}}"}
         ],
-        "fallback_compat_narrative": "你们的基础合盘分数是{score}分，{summary}。（请设定 OPENAI_API_KEY 以启用 AI 深度报告）",
+        "fallback_compat_narrative": "你们的基础合盘分数是{score}分，{summary}。（请设定 GEMINI_API_KEY 以启用 AI 深度报告）",
         "fallback_conflict": ["当你情绪激动时，对方可能会退缩", "你们对『安全感』的定义不同"],
         "fallback_comm_guide": {
             "当你生气时": "先深呼吸，给自己 10 分钟冷静",
@@ -258,7 +278,7 @@ Based on the following two people's chart data and basic compatibility score, ge
   ]
 }
 """,
-        "fallback_profile": "You are a {day_master} Day Master, {xingxiu} Lunar Mansion, {energy_type}. All five systems together paint a unique picture of who you are. (Set OPENAI_API_KEY to enable AI report generation)",
+        "fallback_profile": "You are a {day_master} Day Master, {xingxiu} Lunar Mansion, {energy_type}. All five systems together paint a unique picture of who you are. (Set GEMINI_API_KEY to enable AI report generation)",
         "fallback_lessons": "Your life lesson is not 'try harder'—it is 'allow yourself to be imperfect'.",
         "fallback_sw": {
             "Outer Expression": {"strength": "Decisive and confident", "weakness": "Can come across as dominating"},
@@ -274,7 +294,7 @@ Based on the following two people's chart data and basic compatibility score, ge
             {"icon": "😴", "title": "{{presc4_title}}", "description": "{{presc4_desc}}"},
             {"icon": "🧹", "title": "{{presc5_title}}", "description": "{{presc5_desc}}"}
         ],
-        "fallback_compat_narrative": "Your basic compatibility score is {score}. {summary} (Set OPENAI_API_KEY to enable AI deep report generation)",
+        "fallback_compat_narrative": "Your basic compatibility score is {score}. {summary} (Set GEMINI_API_KEY to enable AI deep report generation)",
         "fallback_conflict": ["When you get emotional, your partner may withdraw", "You define 'security' differently"],
         "fallback_comm_guide": {
             "When you're upset": "Take a deep breath, give yourself 10 minutes",
@@ -904,13 +924,13 @@ async def generate_personal_report(chart: Dict[str, Any], lang: str = "zh-TW", t
     """Generate AI-powered personal full report"""
     p = PROMPTS.get(lang, PROMPTS["zh-TW"])
     
-    if not client or not settings.OPENAI_API_KEY:
+    if not _gemini_client:
         # Fallback: return structured placeholders when AI is not configured
         day_master = chart['bazi'].get('day_master', '?')
         xingxiu = chart.get('xingxiu', '?')
         energy_type = chart['humandesign'].get('energy_type', '?')
         authority = chart['humandesign'].get('authority', '?')
-        
+
         smart_prescriptions = _build_smart_prescription(chart, lang)
         result = {
             "integrated_profile": p["fallback_profile"].format(
@@ -927,33 +947,19 @@ async def generate_personal_report(chart: Dict[str, Any], lang: str = "zh-TW", t
                 "朋友": "不必總是撐住全場，偶爾示弱也是一種信任"
             }
         return result
-    
+
     chart_text = _serialize_chart(chart)
     schema = _build_personal_tier_prompt(p['schema_personal'], tier, lang)
-    prompt = f"Chart data:\n{chart_text}\n\n{schema}"
-    
+    prompt_text = f"Chart data:\n{chart_text}\n\n{schema}"
+
     max_tokens = {"lite": 800, "standard": 1500, "premium": 2500}.get(tier, 1500)
-    
-    response = await client.chat.completions.create(
-        model=settings.OPENAI_MODEL,
-        messages=[
-            {"role": "system", "content": p["system_personal"]},
-            {"role": "user", "content": prompt}
-        ],
-        response_format={"type": "json_object"},
-        temperature=0.8,
-        max_tokens=max_tokens
-    )
-    
-    content = response.choices[0].message.content
-    result = json.loads(content)
-    result["_ai_metadata"] = {
-        "model": response.model,
-        "tier": tier,
-        "prompt_tokens": response.usage.prompt_tokens if response.usage else 0,
-        "completion_tokens": response.usage.completion_tokens if response.usage else 0,
-        "total_tokens": response.usage.total_tokens if response.usage else 0
-    }
+
+    try:
+        content = await _call_gemini(p["system_personal"], prompt_text, max_tokens)
+        result = json.loads(content)
+    except Exception as e:
+        raise RuntimeError(f"Gemini API error: {e}") from e
+    result["_ai_metadata"] = {"model": settings.GEMINI_MODEL, "tier": tier}
     return result
 
 
@@ -1013,7 +1019,7 @@ async def generate_compatibility_report(chart1: Dict[str, Any], chart2: Dict[str
     """Generate AI-powered deep compatibility report"""
     p = PROMPTS.get(lang, PROMPTS["zh-TW"])
     
-    if not client or not settings.OPENAI_API_KEY:
+    if not _gemini_client:
         score = basic_compat.get('overall_score', '?')
         summary = basic_compat.get('summary', '')
         result = {
@@ -1030,7 +1036,7 @@ async def generate_compatibility_report(chart1: Dict[str, Any], chart2: Dict[str
                 "week4": "寫一封信給對方，不發，只是整理感受"
             }
         return result
-    
+
     data_text = f"""
 [Person 1]
 {_serialize_chart(chart1)}
@@ -1043,29 +1049,15 @@ async def generate_compatibility_report(chart1: Dict[str, Any], chart2: Dict[str
 
 {_build_compat_tier_prompt(p['schema_compat'], tier, lang)}
 """
-    
+
     max_tokens = {"lite": 800, "standard": 1500, "premium": 3000}.get(tier, 1500)
-    
-    response = await client.chat.completions.create(
-        model=settings.OPENAI_MODEL,
-        messages=[
-            {"role": "system", "content": p["system_compat"]},
-            {"role": "user", "content": data_text}
-        ],
-        response_format={"type": "json_object"},
-        temperature=0.8,
-        max_tokens=max_tokens
-    )
-    
-    content = response.choices[0].message.content
-    result = json.loads(content)
-    result["_ai_metadata"] = {
-        "model": response.model,
-        "tier": tier,
-        "prompt_tokens": response.usage.prompt_tokens if response.usage else 0,
-        "completion_tokens": response.usage.completion_tokens if response.usage else 0,
-        "total_tokens": response.usage.total_tokens if response.usage else 0
-    }
+
+    try:
+        content = await _call_gemini(p["system_compat"], data_text, max_tokens)
+        result = json.loads(content)
+    except Exception as e:
+        raise RuntimeError(f"Gemini API error: {e}") from e
+    result["_ai_metadata"] = {"model": settings.GEMINI_MODEL, "tier": tier}
     return result
 
 
@@ -1184,11 +1176,11 @@ async def generate_answer(chart: Dict[str, Any], question: str, lang: str = "zh-
     """Generate AI answer to a chart-based question"""
     ask_p = ASK_PROMPTS.get(lang, ASK_PROMPTS["zh-TW"])
     
-    if not client or not settings.OPENAI_API_KEY:
+    if not _gemini_client:
         return _build_fallback_answer(chart, question, lang)
-    
+
     chart_text = _serialize_chart(chart)
-    
+
     # Tier-based length control
     is_zh = lang.startswith("zh")
     if tier == "lite":
@@ -1200,8 +1192,8 @@ async def generate_answer(chart: Dict[str, Any], question: str, lang: str = "zh-
     else:
         length_hint = "回答請寫 200-300 字。" if is_zh else "Write 200-300 words."
         max_tokens = 800
-    
-    prompt = f"""使用者問題：{question}
+
+    prompt_text = f"""使用者問題：{question}
 
 命盤資料：
 {chart_text}
@@ -1209,27 +1201,13 @@ async def generate_answer(chart: Dict[str, Any], question: str, lang: str = "zh-
 {ask_p['schema_ask']}
 
 {length_hint}"""
-    
-    response = await client.chat.completions.create(
-        model=settings.OPENAI_MODEL,
-        messages=[
-            {"role": "system", "content": ask_p["system_ask"]},
-            {"role": "user", "content": prompt}
-        ],
-        response_format={"type": "json_object"},
-        temperature=0.8,
-        max_tokens=max_tokens
-    )
-    
-    content = response.choices[0].message.content
-    result = json.loads(content)
-    result["_ai_metadata"] = {
-        "model": response.model,
-        "tier": tier,
-        "prompt_tokens": response.usage.prompt_tokens if response.usage else 0,
-        "completion_tokens": response.usage.completion_tokens if response.usage else 0,
-        "total_tokens": response.usage.total_tokens if response.usage else 0
-    }
+
+    try:
+        content = await _call_gemini(ask_p["system_ask"], prompt_text, max_tokens)
+        result = json.loads(content)
+    except Exception as e:
+        raise RuntimeError(f"Gemini API error: {e}") from e
+    result["_ai_metadata"] = {"model": settings.GEMINI_MODEL, "tier": tier}
     return result
 
 
@@ -1324,7 +1302,7 @@ def _build_family_fallback(members: List[Dict[str, Any]], lang: str = "zh-TW") -
     
     if is_en:
         return {
-            "family_narrative": f"Your family of {len(members)} members is a unique constellation. Each person brings a distinct energy that creates a dynamic greater than the sum of its parts. The key to harmony is not making everyone the same, but honoring each person's unique design while finding the common thread that binds you together. (Set OPENAI_API_KEY for deeper AI analysis)",
+            "family_narrative": f"Your family of {len(members)} members is a unique constellation. Each person brings a distinct energy that creates a dynamic greater than the sum of its parts. The key to harmony is not making everyone the same, but honoring each person's unique design while finding the common thread that binds you together. (Set GEMINI_API_KEY for deeper AI analysis)",
             "member_reports": member_reports,
             "relationship_matrix": relationship_matrix,
             "family_prescription": [
@@ -1340,7 +1318,7 @@ def _build_family_fallback(members: List[Dict[str, Any]], lang: str = "zh-TW") -
         }
     
     return {
-        "family_narrative": f"你們這個{len(members)}人家庭是一個獨特的星群。每個人帶來不同的能量，創造出超越個體總和的動力學。和諧的關鍵不是讓每個人一樣，而是尊重每個人的獨特設計，同時找到連結你們的共同線索。（設定 OPENAI_API_KEY 以啟用更深入的 AI 分析）",
+        "family_narrative": f"你們這個{len(members)}人家庭是一個獨特的星群。每個人帶來不同的能量，創造出超越個體總和的動力學。和諧的關鍵不是讓每個人一樣，而是尊重每個人的獨特設計，同時找到連結你們的共同線索。（設定 GEMINI_API_KEY 以啟用更深入的 AI 分析）",
         "member_reports": member_reports,
         "relationship_matrix": relationship_matrix,
         "family_prescription": [
@@ -1360,15 +1338,15 @@ async def generate_family_report(members: List[Dict[str, Any]], lang: str = "zh-
     """Generate AI-powered family constellation report"""
     fp = FAMILY_PROMPTS.get(lang, FAMILY_PROMPTS["zh-TW"])
     
-    if not client or not settings.OPENAI_API_KEY:
+    if not _gemini_client:
         return _build_family_fallback(members, lang)
-    
+
     # Serialize all member charts
     members_text = "\n\n".join([
         f"[Member {i+1}: {m.get('name', 'Unknown')} - {m.get('role', 'member')}]\n{_serialize_chart(m.get('chart', {}))}"
         for i, m in enumerate(members)
     ])
-    
+
     is_zh = lang.startswith("zh")
     if tier == "lite":
         length_hint = "請精簡輸出：family_narrative 150字，member_reports 每人1句話，relationship_matrix 只給最重要的1-2對。" if is_zh else "Keep it concise."
@@ -1379,35 +1357,21 @@ async def generate_family_report(members: List[Dict[str, Any]], lang: str = "zh-
     else:
         length_hint = "請平衡深度與長度。" if is_zh else "Balanced depth."
         max_tokens = 1800
-    
-    prompt = f"""以下是一個家庭的所有成員命盤資料：
+
+    prompt_text = f"""以下是一個家庭的所有成員命盤資料：
 
 {members_text}
 
 {fp['schema']}
 
 {length_hint}"""
-    
-    response = await client.chat.completions.create(
-        model=settings.OPENAI_MODEL,
-        messages=[
-            {"role": "system", "content": fp["system"]},
-            {"role": "user", "content": prompt}
-        ],
-        response_format={"type": "json_object"},
-        temperature=0.8,
-        max_tokens=max_tokens
-    )
-    
-    content = response.choices[0].message.content
-    result = json.loads(content)
-    result["_ai_metadata"] = {
-        "model": response.model,
-        "tier": tier,
-        "prompt_tokens": response.usage.prompt_tokens if response.usage else 0,
-        "completion_tokens": response.usage.completion_tokens if response.usage else 0,
-        "total_tokens": response.usage.total_tokens if response.usage else 0
-    }
+
+    try:
+        content = await _call_gemini(fp["system"], prompt_text, max_tokens)
+        result = json.loads(content)
+    except Exception as e:
+        raise RuntimeError(f"Gemini API error: {e}") from e
+    result["_ai_metadata"] = {"model": settings.GEMINI_MODEL, "tier": tier}
     return result
 
 
@@ -1434,7 +1398,7 @@ def _build_annual_fallback(chart: Dict[str, Any], year: int, lang: str = "zh-TW"
         }
         return {
             "year_theme": themes.get(element, "Year of Discovery"),
-            "yearly_overview": f"{current_year} brings the {annual_pillar} annual pillar. For your {dm} Day Master ({element}), this year invites you to {'focus on structure and boundaries' if element == '金' else 'expand and take risks' if element == '木' else 'go with the flow and trust intuition' if element == '水' else 'take bold action and lead' if element == '火' else 'build solid foundations'}. As a {hd_type}, your strategy this year is to {'respond to what excites you' if hd_type in ['生產者', '顯示生產者'] else 'wait for the right invitations' if hd_type == '投射者' else 'initiate and inform' if hd_type == '顯示者' else 'observe the full lunar cycle before deciding'}. (Set OPENAI_API_KEY for deeper analysis)",
+            "yearly_overview": f"{current_year} brings the {annual_pillar} annual pillar. For your {dm} Day Master ({element}), this year invites you to {'focus on structure and boundaries' if element == '金' else 'expand and take risks' if element == '木' else 'go with the flow and trust intuition' if element == '水' else 'take bold action and lead' if element == '火' else 'build solid foundations'}. As a {hd_type}, your strategy this year is to {'respond to what excites you' if hd_type in ['生產者', '顯示生產者'] else 'wait for the right invitations' if hd_type == '投射者' else 'initiate and inform' if hd_type == '顯示者' else 'observe the full lunar cycle before deciding'}. (Set GEMINI_API_KEY for deeper analysis)",
             "bazi_luck": {
                 "annual_pillar": annual_pillar,
                 "luck_direction": f"The {element} element interacts with this year's energy",
@@ -1467,7 +1431,7 @@ def _build_annual_fallback(chart: Dict[str, Any], year: int, lang: str = "zh-TW"
     }
     return {
         "year_theme": themes.get(element, "探索之年"),
-        "yearly_overview": f"{current_year}年迎來{annual_pillar}流年。對於{dm}日主（五行{element}）的你來說，這一年邀請你{'專注於結構與邊界' if element == '金' else '拓展與冒險' if element == '木' else '順流而下、信任直覺' if element == '水' else '大膽行動、展現領導力' if element == '火' else '建立穩固基礎'}。以你的人類圖類型{hd_type}來說，今年的策略是{'回應讓你興奮的事物' if hd_type in ['生產者', '顯示生產者'] else '等待正確的邀請' if hd_type == '投射者' else '主動發起並告知' if hd_type == '顯示者' else '觀察完整月週期再做決定'}。（設定 OPENAI_API_KEY 以啟用更深入的分析）",
+        "yearly_overview": f"{current_year}年迎來{annual_pillar}流年。對於{dm}日主（五行{element}）的你來說，這一年邀請你{'專注於結構與邊界' if element == '金' else '拓展與冒險' if element == '木' else '順流而下、信任直覺' if element == '水' else '大膽行動、展現領導力' if element == '火' else '建立穩固基礎'}。以你的人類圖類型{hd_type}來說，今年的策略是{'回應讓你興奮的事物' if hd_type in ['生產者', '顯示生產者'] else '等待正確的邀請' if hd_type == '投射者' else '主動發起並告知' if hd_type == '顯示者' else '觀察完整月週期再做決定'}。（設定 GEMINI_API_KEY 以啟用更深入的分析）",
         "bazi_luck": {
             "annual_pillar": annual_pillar,
             "luck_direction": f"{element}元素與今年流年能量的互動",
@@ -1499,11 +1463,11 @@ async def generate_annual_report(chart: Dict[str, Any], year: int, lang: str = "
     """Generate AI-powered annual destiny report"""
     ap = ANNUAL_PROMPTS.get(lang, ANNUAL_PROMPTS["zh-TW"])
     
-    if not client or not settings.OPENAI_API_KEY:
+    if not _gemini_client:
         return _build_annual_fallback(chart, year, lang)
-    
+
     chart_text = _serialize_chart(chart)
-    
+
     is_zh = lang.startswith("zh")
     if tier == "lite":
         length_hint = "請精簡輸出：yearly_overview 150字，monthly_insights 只給重點月份。" if is_zh else "Keep it concise."
@@ -1514,8 +1478,8 @@ async def generate_annual_report(chart: Dict[str, Any], year: int, lang: str = "
     else:
         length_hint = "請平衡深度與長度，12個月都要涵蓋。" if is_zh else "Balanced depth, cover all 12 months."
         max_tokens = 2000
-    
-    prompt = f"""目標年份：{year}
+
+    prompt_text = f"""目標年份：{year}
 
 命盤資料：
 {chart_text}
@@ -1523,25 +1487,11 @@ async def generate_annual_report(chart: Dict[str, Any], year: int, lang: str = "
 {ap['schema']}
 
 {length_hint}"""
-    
-    response = await client.chat.completions.create(
-        model=settings.OPENAI_MODEL,
-        messages=[
-            {"role": "system", "content": ap["system"]},
-            {"role": "user", "content": prompt}
-        ],
-        response_format={"type": "json_object"},
-        temperature=0.8,
-        max_tokens=max_tokens
-    )
-    
-    content = response.choices[0].message.content
-    result = json.loads(content)
-    result["_ai_metadata"] = {
-        "model": response.model,
-        "tier": tier,
-        "prompt_tokens": response.usage.prompt_tokens if response.usage else 0,
-        "completion_tokens": response.usage.completion_tokens if response.usage else 0,
-        "total_tokens": response.usage.total_tokens if response.usage else 0
-    }
+
+    try:
+        content = await _call_gemini(ap["system"], prompt_text, max_tokens)
+        result = json.loads(content)
+    except Exception as e:
+        raise RuntimeError(f"Gemini API error: {e}") from e
+    result["_ai_metadata"] = {"model": settings.GEMINI_MODEL, "tier": tier}
     return result

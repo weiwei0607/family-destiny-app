@@ -19,19 +19,15 @@ class ApiService {
   factory ApiService() => _instance;
   ApiService._internal();
 
+  static const _timeout = Duration(seconds: 30);
+
   final _client = http.Client();
-  bool _isPremium = false;
-  String _lang = 'zh-TW';
-
-  bool get isPremium => _isPremium;
-  set isPremium(bool value) => _isPremium = value;
-
-  String get lang => _lang;
-  set lang(String value) => _lang = value;
+  bool isPremium = false;
+  String lang = 'zh-TW';
 
   Map<String, String> get _headers => {
     'Content-Type': 'application/json',
-    if (_isPremium) 'Authorization': ApiConfig.devPremiumToken,
+    if (isPremium) 'Authorization': ApiConfig.devPremiumToken,
   };
 
   /// Free tier: Get basic chart
@@ -51,9 +47,9 @@ class ApiService {
         'date': date,
         'time': time,
         'location': location,
-        'lang': _lang,
+        'lang': lang,
       }),
-    );
+    ).timeout(_timeout);
 
     if (response.statusCode == 200) {
       return BasicChart.fromJson(jsonDecode(response.body));
@@ -71,11 +67,11 @@ class ApiService {
       Uri.parse('${ApiConfig.baseUrl}/api/free/compatibility'),
       headers: {'Content-Type': 'application/json'},
       body: jsonEncode({
-        'person1': {...person1, 'lang': _lang},
-        'person2': {...person2, 'lang': _lang},
-        'lang': _lang,
+        'person1': {...person1, 'lang': lang},
+        'person2': {...person2, 'lang': lang},
+        'lang': lang,
       }),
-    );
+    ).timeout(_timeout);
 
     if (response.statusCode == 200) {
       return BasicCompatibility.fromJson(jsonDecode(response.body));
@@ -102,10 +98,10 @@ class ApiService {
         'date': date,
         'time': time,
         'location': location,
-        'lang': _lang,
+        'lang': lang,
         'tier': tier,
       }),
-    );
+    ).timeout(_timeout);
 
     if (response.statusCode == 200) {
       return FullReport.fromJson(jsonDecode(response.body));
@@ -128,10 +124,10 @@ class ApiService {
       body: jsonEncode({
         'chart': chart,
         'question': question,
-        'lang': _lang,
+        'lang': lang,
         'tier': tier,
       }),
-    );
+    ).timeout(_timeout);
 
     if (response.statusCode == 200) {
       return AskResponse.fromJson(jsonDecode(response.body));
@@ -152,10 +148,10 @@ class ApiService {
       headers: _headers,
       body: jsonEncode({
         'members': members,
-        'lang': _lang,
+        'lang': lang,
         'tier': tier,
       }),
-    );
+    ).timeout(_timeout);
 
     if (response.statusCode == 200) {
       return FamilyReport.fromJson(jsonDecode(response.body));
@@ -186,10 +182,10 @@ class ApiService {
         'time': time,
         'location': location,
         'year': year,
-        'lang': _lang,
+        'lang': lang,
         'tier': tier,
       }),
-    );
+    ).timeout(_timeout);
 
     if (response.statusCode == 200) {
       return AnnualReport.fromJson(jsonDecode(response.body));
@@ -210,12 +206,12 @@ class ApiService {
       Uri.parse('${ApiConfig.baseUrl}/api/premium/compatibility-deep'),
       headers: _headers,
       body: jsonEncode({
-        'person1': {...person1, 'lang': _lang},
-        'person2': {...person2, 'lang': _lang},
-        'lang': _lang,
+        'person1': {...person1, 'lang': lang},
+        'person2': {...person2, 'lang': lang},
+        'lang': lang,
         'tier': tier,
       }),
-    );
+    ).timeout(_timeout);
 
     if (response.statusCode == 200) {
       return DeepCompatibility.fromJson(jsonDecode(response.body));

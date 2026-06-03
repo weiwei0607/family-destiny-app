@@ -70,6 +70,7 @@ class _CompatibilityReportScreenState extends State<CompatibilityReportScreen> {
       });
     } catch (e) {
       setState(() => _loadingPremium = false);
+      if (!mounted) return;
       if (e.toString().contains('PREMIUM_REQUIRED')) {
         _showPaywall();
       } else {
@@ -126,7 +127,7 @@ class _CompatibilityReportScreenState extends State<CompatibilityReportScreen> {
               label: 'Standard',
               badge: '最熱門',
               desc: '敘事 + 衝突點 + 溝通指南',
-              color: const Color(0xFF667EEA).withOpacity(0.08),
+              color: const Color(0xFF667EEA).withValues(alpha: 0.08),
               borderColor: const Color(0xFF667EEA),
               onTap: () {
                 Navigator.pop(context);
@@ -152,6 +153,7 @@ class _CompatibilityReportScreenState extends State<CompatibilityReportScreen> {
                 Navigator.pop(context);
                 final adProvider = context.read<AdProvider>();
                 await adProvider.watchAdToUnlock(unlockDuration: const Duration(hours: 1));
+                if (!context.mounted) return;
                 if (adProvider.isPremiumUnlocked) {
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
@@ -232,7 +234,7 @@ class _CompatibilityReportScreenState extends State<CompatibilityReportScreen> {
                       Container(
                         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                         decoration: BoxDecoration(
-                          color: (borderColor ?? const Color(0xFF667EEA)).withOpacity(0.15),
+                          color: (borderColor ?? const Color(0xFF667EEA)).withValues(alpha: 0.15),
                           borderRadius: BorderRadius.circular(8),
                         ),
                         child: Text(
@@ -451,7 +453,7 @@ class _CompatibilityReportScreenState extends State<CompatibilityReportScreen> {
                   gradient: LinearGradient(
                     begin: Alignment.topCenter,
                     end: Alignment.bottomCenter,
-                    colors: [Colors.grey.shade50.withOpacity(0), Colors.grey.shade50],
+                    colors: [Colors.grey.shade50.withValues(alpha: 0), Colors.grey.shade50],
                   ),
                 ),
                 child: const Center(

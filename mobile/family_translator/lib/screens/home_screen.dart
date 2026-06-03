@@ -115,7 +115,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   icon: Icons.family_restroom,
                   title: l10n.familyMode,
                   subtitle: l10n.familyModeSubtitle,
-                  color: Colors.amber.shade100,
+                  color: Colors.white,
                   onTap: () => Navigator.push(
                     context,
                     MaterialPageRoute(builder: (_) => const FamilyScreen()),
@@ -125,8 +125,8 @@ class _HomeScreenState extends State<HomeScreen> {
                 _buildModeCard(
                   context,
                   icon: Icons.calendar_today,
-                  title: '年度運勢',
-                  subtitle: '查看這一年的運勢走向與每月重點',
+                  title: l10n.annualMode,
+                  subtitle: l10n.annualModeSubtitle,
                   color: Colors.white,
                   onTap: () => Navigator.push(
                     context,
@@ -168,7 +168,7 @@ class _HomeScreenState extends State<HomeScreen> {
               Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: const Color(0xFF667EEA).withOpacity(0.1),
+                  color: const Color(0xFF667EEA).withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Icon(icon, color: const Color(0xFF667EEA), size: 28),
