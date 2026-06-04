@@ -3,3 +3,4 @@ gunicorn>=21.0
 skyfield>=1.49
 pyswisseph>=2.10
 Werkzeug>=3.0.0
+pytz>=2024.1
