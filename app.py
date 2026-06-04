@@ -7,6 +7,10 @@ from datetime import datetime, timezone, timedelta
 
 app = Flask(__name__)
 
+@app.route('/health')
+def health_check():
+    return jsonify({'status': 'ok', 'service': 'family-destiny'})
+
 TWN_TZ = timezone(timedelta(hours=8))   # 台灣時區 UTC+8
 
 # ── 人物分析快取（以出生資料為 key，name 不影響計算）──
