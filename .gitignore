@@ -32,3 +32,6 @@ yancheng_*.py
 # Mobile build artifacts
 mobile/build/
 mobile/.dart_tool/
+
+# Generated SQLite DB (built from lunar_table.json at deploy time)
+lunar.db
