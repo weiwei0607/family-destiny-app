@@ -2,6 +2,8 @@ __pycache__/
 *.pyc
 *.pyo
 .env
+.env*
+!.env.example
 .venv/
 venv/
 *.egg-info/
@@ -10,3 +12,23 @@ skyfield_data/
 de421.bsp
 *.bsp
 .DS_Store
+
+# Generated reports & portraits
+portrait_*.md
+report_*.md
+group_insight_*.md
+group_dynamics.md
+relationship_matrix.md
+
+# Generated charts
+*.png
+family_org_chart.png
+
+# One-off scripts
+generate_*.py
+three_friends_report.py
+yancheng_*.py
+
+# Mobile build artifacts
+mobile/build/
+mobile/.dart_tool/
