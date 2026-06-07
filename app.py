@@ -4,8 +4,16 @@ from engine import compatibility as compat
 from engine import travel as travel_engine
 from engine import health as health_engine
 from datetime import datetime, timezone, timedelta
+from flask_limiter import Limiter
+from flask_limiter.util import get_remote_address
 
 app = Flask(__name__)
+limiter = Limiter(
+    get_remote_address,
+    app=app,
+    default_limits=["200 per day", "30 per hour"],
+    storage_uri="memory://",
+)
 
 @app.route('/health')
 def health_check():
@@ -305,6 +313,7 @@ def index():
     return render_template('index.html')
 
 @app.route('/api/analyze', methods=['POST'])
+@limiter.limit("10 per minute; 50 per day")
 def analyze():
     """個人分析 API（免費）"""
     data = request.get_json()
@@ -312,6 +321,7 @@ def analyze():
     return jsonify(result)
 
 @app.route('/api/compatibility', methods=['POST'])
+@limiter.limit("5 per minute; 20 per day")
 def compatibility():
     """合盤分析 API（免費預覽 + 付費牆提示由前端控制）"""
     data = request.get_json()
@@ -666,6 +676,7 @@ def _generate_friends_report(friends_data):
 # ---------- new routes ----------
 
 @app.route('/api/family-report', methods=['POST'])
+@limiter.limit("3 per minute; 10 per day")
 def family_report():
     """家庭報告 API（3-6人）
     
@@ -688,6 +699,7 @@ def family_report():
 
 
 @app.route('/api/friends-report', methods=['POST'])
+@limiter.limit("3 per minute; 10 per day")
 def friends_report():
     """閨蜜報告 API（2-3人）
     
