@@ -682,10 +682,15 @@ def bazi_shengci(bazi):
 
 def western_astrology(dt, lat=25.0330, lon=121.5654):
     import math
+    from datetime import timezone as _tz
     eph = get_eph()
     ts = get_ts()
     obs_lat, obs_lon = lat, lon
     observer = get_observer(obs_lat, obs_lon)
+    # 修正：dt 帶時區（如 UTC+8）時必須先轉成真正的 UTC，
+    # 否則會把當地時間誤當 UTC，導致上升點/月亮/人類圖整體算錯（最多差數小時）
+    if dt.tzinfo is not None:
+        dt = dt.astimezone(_tz.utc)
     t = ts.utc(dt.year, dt.month, dt.day, dt.hour, dt.minute)
     e = observer.at(t)
     bodies = {
