@@ -4,106 +4,331 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="description" content="輸入生日，拿到自己的使用手冊 + 家庭的溝通指南。八字、占星、紫微、人類圖、星宿 — 五系統交叉驗證，讓你更懂自己，也更懂家人。">
-<meta name="theme-color" content="#0f0f12">
+<meta name="theme-color" content="#0b0b0f">
 <meta property="og:title" content="Family Destiny · 家庭關係翻譯師">
 <meta property="og:description" content="五系統命理交叉驗證 — 更懂自己，更懂家人">
 <meta property="og:type" content="website">
 <title>Family Destiny · 家庭關係翻譯師</title>
-<script src="https://cdn.tailwindcss.com"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;600;700;900&family=Noto+Sans+TC:wght@300;400;500;700&display=swap" rel="stylesheet">
 <style>
+  :root {
+    color-scheme: dark;
+    --bg: #0a0a0d;
+    --bg-soft: #131318;
+    --text: #ece9e3;
+    --text-dim: rgba(236, 233, 227, 0.58);
+    --text-faint: rgba(236, 233, 227, 0.32);
+    --border: rgba(255, 255, 255, 0.08);
+    --border-soft: rgba(255, 255, 255, 0.05);
+    --gold: #d4af37;
+    --gold-light: #f5e6a3;
+    --rose: #e28aa5;
+    --purple: #b18fe8;
+    --radius-lg: 20px;
+    --radius-md: 14px;
+    --radius-sm: 10px;
+  }
+
+  * { box-sizing: border-box; }
+
   body {
-    font-family: 'Noto Sans TC', sans-serif;
-    background: #0f0f12;
-    color: #e8e6e3;
+    margin: 0;
+    font-family: 'Noto Sans TC', -apple-system, 'PingFang TC', 'Microsoft JhengHei', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    -webkit-font-smoothing: antialiased;
+    min-height: 100vh;
   }
-  .serif { font-family: 'Noto Serif TC', serif; }
-  .gradient-text {
-    background: linear-gradient(135deg, #d4af37 0%, #f5e6a3 50%, #d4af37 100%);
+
+  .serif { font-family: 'Noto Serif TC', 'PingFang TC', serif; }
+
+  .wrap { max-width: 720px; margin: 0 auto; padding: 0 24px; }
+
+  a { color: inherit; }
+
+  /* ---------- Hero ---------- */
+  .hero {
+    position: relative;
+    overflow: hidden;
+    padding: 88px 0 48px;
+    text-align: center;
+  }
+  .hero::before, .hero::after {
+    content: "";
+    position: absolute;
+    width: 420px;
+    height: 420px;
+    border-radius: 50%;
+    filter: blur(90px);
+    opacity: 0.16;
+    z-index: 0;
+    pointer-events: none;
+  }
+  .hero::before { background: var(--gold); top: -160px; left: 8%; }
+  .hero::after { background: var(--purple); bottom: -180px; right: 8%; }
+
+  .hero .wrap { position: relative; z-index: 1; }
+
+  .kicker {
+    font-size: 12px;
+    letter-spacing: 0.35em;
+    text-transform: uppercase;
+    color: rgba(212, 175, 55, 0.65);
+    margin: 0 0 18px;
+  }
+
+  h1.title {
+    font-size: clamp(34px, 6vw, 58px);
+    font-weight: 900;
+    line-height: 1.25;
+    margin: 0 0 18px;
+    padding-bottom: 4px;
+    background: linear-gradient(135deg, var(--gold) 0%, var(--gold-light) 50%, var(--gold) 100%);
     -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
     background-clip: text;
+    -webkit-text-fill-color: transparent;
   }
-  .card-glass {
-    background: rgba(255,255,255,0.03);
-    border: 1px solid rgba(255,255,255,0.06);
-    backdrop-filter: blur(10px);
+
+  .subtitle { font-size: 17px; color: var(--text-dim); margin: 0 0 8px; }
+  .systems {
+    font-size: 13px;
+    color: var(--text-faint);
+    margin: 20px 0 0;
+    letter-spacing: 0.02em;
   }
+
+  /* ---------- Tabs ---------- */
+  .tabs {
+    display: flex;
+    gap: 6px;
+    padding: 5px;
+    margin: 40px 0 24px;
+    background: var(--bg-soft);
+    border: 1px solid var(--border-soft);
+    border-radius: 999px;
+  }
+  .tab {
+    flex: 1;
+    padding: 12px 10px;
+    border: 1px solid transparent;
+    border-radius: 999px;
+    background: transparent;
+    color: var(--text-faint);
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+  .tab:hover { color: var(--text-dim); }
+  .tab.active {
+    background: rgba(212, 175, 55, 0.14);
+    border-color: rgba(212, 175, 55, 0.35);
+    color: var(--gold);
+  }
+
+  /* ---------- Panels / Cards ---------- */
+  .panel {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 32px;
+    backdrop-filter: blur(12px);
+    box-shadow: 0 20px 50px -30px rgba(0, 0, 0, 0.6);
+  }
+  .panel.hidden { display: none; }
+  .panel + .panel { margin-top: 20px; }
+
+  .panel h2 {
+    font-size: 20px;
+    font-weight: 700;
+    margin: 0 0 6px;
+    color: var(--text);
+  }
+  .panel .desc {
+    font-size: 13px;
+    color: var(--text-faint);
+    margin: 0 0 24px;
+  }
+
+  .grid-2 { display: grid; grid-template-columns: 1fr; gap: 16px; }
+  @media (min-width: 620px) { .grid-2 { grid-template-columns: 1fr 1fr; } }
+  .span-2 { grid-column: 1 / -1; }
+
+  .field label {
+    display: block;
+    font-size: 12px;
+    color: var(--text-faint);
+    margin-bottom: 6px;
+  }
+
   input, select {
-    background: rgba(255,255,255,0.05);
-    border: 1px solid rgba(255,255,255,0.1);
-    color: white;
+    width: 100%;
+    height: 46px;
+    padding: 0 16px;
+    border-radius: var(--radius-sm);
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--border);
+    color: var(--text);
+    font-family: inherit;
+    font-size: 14px;
+    transition: border-color 0.2s ease, background 0.2s ease;
   }
+  input::placeholder { color: var(--text-faint); }
   input:focus, select:focus {
     outline: none;
-    border-color: rgba(212,175,55,0.5);
+    border-color: rgba(212, 175, 55, 0.55);
+    background: rgba(255, 255, 255, 0.07);
   }
-  .tab-active {
-    background: rgba(212,175,55,0.15);
-    border-color: rgba(212,175,55,0.4);
-    color: #d4af37;
+  select {
+    appearance: none;
+    -webkit-appearance: none;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%23eae7e1' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'/></svg>");
+    background-repeat: no-repeat;
+    background-position: right 14px center;
+    padding-right: 38px;
   }
+  input[type="date"], input[type="time"] { color-scheme: dark; }
+
+  .btn {
+    width: 100%;
+    margin-top: 8px;
+    padding: 15px;
+    border-radius: var(--radius-sm);
+    border: 1px solid transparent;
+    font-family: inherit;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+  .btn-gold { background: rgba(212, 175, 55, 0.15); border-color: rgba(212, 175, 55, 0.35); color: var(--gold-light); }
+  .btn-gold:hover { background: rgba(212, 175, 55, 0.26); }
+  .btn-rose { background: rgba(226, 138, 165, 0.15); border-color: rgba(226, 138, 165, 0.35); color: var(--rose); }
+  .btn-rose:hover { background: rgba(226, 138, 165, 0.26); }
+  .btn-purple { background: rgba(177, 143, 232, 0.15); border-color: rgba(177, 143, 232, 0.35); color: var(--purple); }
+  .btn-purple:hover { background: rgba(177, 143, 232, 0.26); }
+
+  .btn-ghost {
+    background: none;
+    border: none;
+    color: var(--text-faint);
+    font-size: 13px;
+    font-family: inherit;
+    cursor: pointer;
+    padding: 8px 0;
+  }
+  .btn-ghost:hover { color: var(--text-dim); }
+
+  .person-block { display: flex; flex-direction: column; gap: 12px; }
+  .person-block h3 { font-size: 13px; font-weight: 700; margin: 0 0 2px; }
+  .person-1 h3 { color: var(--gold); }
+  .person-2 h3 { color: var(--rose); }
+
+  .family-member {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 10px;
+    padding: 16px;
+    border-radius: var(--radius-sm);
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid var(--border-soft);
+    margin-bottom: 12px;
+  }
+  @media (min-width: 620px) { .family-member { grid-template-columns: 1.4fr 0.8fr 1fr 1fr; } }
+
+  /* ---------- Sections ---------- */
+  section.block { padding: 8px 0 56px; }
+
+  .divider {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin: 0 0 28px;
+  }
+  .divider .line { height: 1px; flex: 1; background: var(--border-soft); }
+  .divider span {
+    font-size: 12px;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--text-faint);
+  }
+
+  .pricing-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+  }
+  @media (min-width: 620px) { .pricing-grid { grid-template-columns: repeat(4, 1fr); } }
+
+  .price-card {
+    text-align: center;
+    padding: 20px 12px;
+    border-radius: var(--radius-md);
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid var(--border);
+  }
+  .price-card .amount { font-size: 19px; font-weight: 800; margin: 0; }
+  .price-card .label { font-size: 12px; color: var(--text-faint); margin: 6px 0 0; }
+  .price-card.featured {
+    background: linear-gradient(160deg, rgba(212, 175, 55, 0.12), rgba(212, 175, 55, 0.02));
+    border-color: rgba(212, 175, 55, 0.4);
+    box-shadow: 0 0 0 1px rgba(212, 175, 55, 0.08) inset;
+  }
+
+  footer { text-align: center; padding: 8px 0 48px; }
+  footer p { font-size: 12px; color: var(--text-faint); margin: 0; }
 </style>
 </head>
-<body class="min-h-screen">
+<body>
 
-<!-- Hero -->
-<section class="relative overflow-hidden px-6 py-16 md:py-24">
-  <div class="absolute inset-0 opacity-20">
-    <div class="absolute top-0 left-1/3 w-96 h-96 bg-amber-500/10 rounded-full blur-3xl"></div>
-    <div class="absolute bottom-0 right-1/3 w-96 h-96 bg-purple-500/10 rounded-full blur-3xl"></div>
-  </div>
-  <div class="relative max-w-2xl mx-auto text-center">
-    <p class="text-amber-500/60 text-xs tracking-[0.3em] uppercase mb-4">Family Destiny</p>
-    <h1 class="serif text-4xl md:text-6xl font-black gradient-text mb-4">家庭關係翻譯師</h1>
-    <p class="text-white/50 text-lg mb-2">輸入生日，拿到自己的使用手冊 + 家庭的溝通指南</p>
-    <p class="text-white/30 text-sm">八字 · 占星 · 紫微 · 人類圖 · 星宿 — 五系統交叉驗證</p>
+<section class="hero">
+  <div class="wrap">
+    <p class="kicker">Family Destiny</p>
+    <h1 class="title serif">家庭關係翻譯師</h1>
+    <p class="subtitle">輸入生日，拿到自己的使用手冊 + 家庭的溝通指南</p>
+    <p class="systems">八字 · 占星 · 紫微 · 人類圖 · 星宿 — 五系統交叉驗證</p>
   </div>
 </section>
 
-<!-- Mode Tabs -->
-<section class="px-6 pb-8">
-  <div class="max-w-2xl mx-auto">
-    <div class="flex gap-2 p-1 rounded-2xl bg-white/5 border border-white/5">
-      <button onclick="switchMode('personal')" id="tab-personal" class="flex-1 py-3 rounded-xl text-sm font-bold transition-all tab-active">個人報告</button>
-      <button onclick="switchMode('compatibility')" id="tab-compatibility" class="flex-1 py-3 rounded-xl text-sm font-bold text-white/40 hover:text-white/70 transition-all">戀愛合盤</button>
-      <button onclick="switchMode('family')" id="tab-family" class="flex-1 py-3 rounded-xl text-sm font-bold text-white/40 hover:text-white/70 transition-all">家庭報告 💎</button>
+<section class="block">
+  <div class="wrap">
+
+    <div class="tabs">
+      <button type="button" onclick="switchMode('personal')" id="tab-personal" class="tab active">個人報告</button>
+      <button type="button" onclick="switchMode('compatibility')" id="tab-compatibility" class="tab">戀愛合盤</button>
+      <button type="button" onclick="switchMode('family')" id="tab-family" class="tab">家庭報告 💎</button>
     </div>
-  </div>
-</section>
-
-<!-- Forms -->
-<section class="px-6 pb-16">
-  <div class="max-w-2xl mx-auto">
 
     <!-- Personal Form -->
-    <form id="form-personal" action="/report/personal" method="get" class="card-glass rounded-2xl p-6 md:p-8 space-y-4">
-      <h2 class="serif text-xl font-bold text-white/90 mb-2">生成個人五系統報告</h2>
-      <p class="text-white/40 text-sm mb-4">免費查看基礎命盤 · 付費解鎖整合畫像與生活處方籤</p>
+    <form id="form-personal" action="/report/personal" method="get" class="panel">
+      <h2 class="serif">生成個人五系統報告</h2>
+      <p class="desc">免費查看基礎命盤 · 付費解鎖整合畫像與生活處方籤</p>
 
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div>
-          <label class="text-xs text-white/40 mb-1 block">姓名</label>
-          <input name="name" type="text" placeholder="例如：韡寧" required class="w-full h-11 px-4 rounded-xl">
+      <div class="grid-2">
+        <div class="field">
+          <label>姓名</label>
+          <input name="name" type="text" placeholder="例如：韡寧" required>
         </div>
-        <div>
-          <label class="text-xs text-white/40 mb-1 block">性別</label>
-          <select name="gender" class="w-full h-11 px-4 rounded-xl">
+        <div class="field">
+          <label>性別</label>
+          <select name="gender">
             <option value="女">女</option>
             <option value="男">男</option>
           </select>
         </div>
-        <div>
-          <label class="text-xs text-white/40 mb-1 block">出生日期</label>
-          <input name="date" type="date" required class="w-full h-11 px-4 rounded-xl">
+        <div class="field">
+          <label>出生日期</label>
+          <input name="date" type="date" required>
         </div>
-        <div>
-          <label class="text-xs text-white/40 mb-1 block">出生時間</label>
-          <input name="time" type="time" value="12:00" required class="w-full h-11 px-4 rounded-xl">
+        <div class="field">
+          <label>出生時間</label>
+          <input name="time" type="time" value="12:00" required>
         </div>
-        <div class="md:col-span-2">
-          <label class="text-xs text-white/40 mb-1 block">出生地</label>
-          <select name="location" class="w-full h-11 px-4 rounded-xl">
+        <div class="field span-2">
+          <label>出生地</label>
+          <select name="location">
             <option value="taipei">台北</option>
             <option value="taichung">台中</option>
             <option value="kaohsiung">高雄</option>
@@ -111,127 +336,117 @@
         </div>
       </div>
 
-      <button type="submit" class="w-full py-3.5 rounded-xl bg-amber-500/15 border border-amber-500/30 text-amber-300 font-bold hover:bg-amber-500/25 transition-all mt-2">
-        生成報告
-      </button>
+      <button type="submit" class="btn btn-gold">生成報告</button>
     </form>
 
     <!-- Compatibility Form -->
-    <form id="form-compatibility" action="/report/compatibility" method="get" class="card-glass rounded-2xl p-6 md:p-8 space-y-4 hidden">
-      <h2 class="serif text-xl font-bold text-white/90 mb-2">生成雙人合盤報告</h2>
-      <p class="text-white/40 text-sm mb-4">免費查看基礎合盤 · 付費解鎖深度關係分析與溝通指南</p>
+    <form id="form-compatibility" action="/report/compatibility" method="get" class="panel hidden">
+      <h2 class="serif">生成雙人合盤報告</h2>
+      <p class="desc">免費查看基礎合盤 · 付費解鎖深度關係分析與溝通指南</p>
 
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <!-- Person 1 -->
-        <div class="space-y-3">
-          <h3 class="text-sm font-bold text-amber-400">第一人</h3>
-          <input name="name1" type="text" placeholder="姓名" required class="w-full h-11 px-4 rounded-xl">
-          <select name="gender1" class="w-full h-11 px-4 rounded-xl">
+      <div class="grid-2">
+        <div class="person-block person-1">
+          <h3>第一人</h3>
+          <input name="name1" type="text" placeholder="姓名" required>
+          <select name="gender1">
             <option value="女">女</option>
             <option value="男">男</option>
           </select>
-          <input name="date1" type="date" required class="w-full h-11 px-4 rounded-xl">
-          <input name="time1" type="time" value="12:00" required class="w-full h-11 px-4 rounded-xl">
+          <input name="date1" type="date" required>
+          <input name="time1" type="time" value="12:00" required>
         </div>
-        <!-- Person 2 -->
-        <div class="space-y-3">
-          <h3 class="text-sm font-bold text-rose-400">第二人</h3>
-          <input name="name2" type="text" placeholder="姓名" required class="w-full h-11 px-4 rounded-xl">
-          <select name="gender2" class="w-full h-11 px-4 rounded-xl">
+        <div class="person-block person-2">
+          <h3>第二人</h3>
+          <input name="name2" type="text" placeholder="姓名" required>
+          <select name="gender2">
             <option value="女">女</option>
             <option value="男">男</option>
           </select>
-          <input name="date2" type="date" required class="w-full h-11 px-4 rounded-xl">
-          <input name="time2" type="time" value="12:00" required class="w-full h-11 px-4 rounded-xl">
+          <input name="date2" type="date" required>
+          <input name="time2" type="time" value="12:00" required>
         </div>
       </div>
 
-      <button type="submit" class="w-full py-3.5 rounded-xl bg-rose-500/15 border border-rose-500/30 text-rose-300 font-bold hover:bg-rose-500/25 transition-all mt-2">
-        生成合盤
-      </button>
+      <button type="submit" class="btn btn-rose">生成合盤</button>
     </form>
 
     <!-- Family Form -->
-    <form id="form-family" action="/report/family" method="post" class="card-glass rounded-2xl p-6 md:p-8 space-y-4 hidden">
-      <h2 class="serif text-xl font-bold text-white/90 mb-2">生成家庭報告</h2>
-      <p class="text-white/40 text-sm mb-4">2-6 人家庭關係矩陣 + 溝通指南 · NT$199/次</p>
-      <div id="family-members" class="space-y-4">
-        <div class="family-member grid grid-cols-1 md:grid-cols-4 gap-3 p-4 rounded-xl bg-white/5">
-          <input name="names[]" type="text" placeholder="姓名" required class="h-11 px-4 rounded-xl">
-          <select name="genders[]" class="h-11 px-4 rounded-xl">
+    <form id="form-family" action="/report/family" method="post" class="panel hidden">
+      <h2 class="serif">生成家庭報告</h2>
+      <p class="desc">2-6 人家庭關係矩陣 + 溝通指南 · NT$199/次</p>
+
+      <div id="family-members">
+        <div class="family-member">
+          <input name="names[]" type="text" placeholder="姓名" required>
+          <select name="genders[]">
             <option value="女">女</option>
             <option value="男">男</option>
           </select>
-          <input name="dates[]" type="date" required class="h-11 px-4 rounded-xl">
-          <input name="times[]" type="time" value="12:00" required class="h-11 px-4 rounded-xl">
+          <input name="dates[]" type="date" required>
+          <input name="times[]" type="time" value="12:00" required>
         </div>
       </div>
-      <button type="button" onclick="addFamilyMember()" class="text-sm text-white/40 hover:text-white/70 transition-colors">+ 新增成員</button>
-      <button type="submit" class="w-full py-3.5 rounded-xl bg-purple-500/15 border border-purple-500/30 text-purple-300 font-bold hover:bg-purple-500/25 transition-all">
-        生成家庭報告
-      </button>
+      <button type="button" onclick="addFamilyMember()" class="btn-ghost">+ 新增成員</button>
+      <button type="submit" class="btn btn-purple">生成家庭報告</button>
     </form>
 
   </div>
 </section>
 
-<!-- Pricing -->
-<section class="px-6 pb-16">
-  <div class="max-w-2xl mx-auto">
-    <div class="flex items-center gap-4 mb-8">
-      <div class="h-px flex-1 bg-white/5"></div>
-      <span class="text-xs text-white/30 tracking-[0.3em] uppercase">價格方案</span>
-      <div class="h-px flex-1 bg-white/5"></div>
+<section class="block">
+  <div class="wrap">
+    <div class="divider">
+      <div class="line"></div>
+      <span>價格方案</span>
+      <div class="line"></div>
     </div>
-    <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
-      <div class="card-glass rounded-2xl p-4 text-center">
-        <p class="text-lg font-bold text-amber-300">NT$99</p>
-        <p class="text-xs text-white/40 mt-1">單次個人報告</p>
+    <div class="pricing-grid">
+      <div class="price-card">
+        <p class="amount" style="color: var(--gold-light);">NT$99</p>
+        <p class="label">單次個人報告</p>
       </div>
-      <div class="card-glass rounded-2xl p-4 text-center">
-        <p class="text-lg font-bold text-rose-300">NT$99</p>
-        <p class="text-xs text-white/40 mt-1">單次戀愛合盤</p>
+      <div class="price-card">
+        <p class="amount" style="color: var(--rose);">NT$99</p>
+        <p class="label">單次戀愛合盤</p>
       </div>
-      <div class="card-glass rounded-2xl p-4 text-center">
-        <p class="text-lg font-bold text-purple-300">NT$199</p>
-        <p class="text-xs text-white/40 mt-1">單次家庭報告</p>
+      <div class="price-card">
+        <p class="amount" style="color: var(--purple);">NT$199</p>
+        <p class="label">單次家庭報告</p>
       </div>
-      <div class="card-gold rounded-2xl p-4 text-center">
-        <p class="text-lg font-bold text-amber-300">NT$299</p>
-        <p class="text-xs text-white/40 mt-1">月訂閱無限</p>
+      <div class="price-card featured">
+        <p class="amount" style="color: var(--gold-light);">NT$299</p>
+        <p class="label">月訂閱無限</p>
       </div>
     </div>
   </div>
 </section>
 
-<footer class="px-6 py-8 text-center">
-  <p class="text-white/20 text-xs">Family Destiny · 五系統命理解讀 · 不是算命，是自我理解</p>
+<footer>
+  <p>Family Destiny · 五系統命理解讀 · 不是算命，是自我理解</p>
 </footer>
 
 <script>
 function switchMode(mode) {
   ['personal', 'compatibility', 'family'].forEach(m => {
     document.getElementById('form-' + m).classList.add('hidden');
-    document.getElementById('tab-' + m).classList.remove('tab-active');
-    document.getElementById('tab-' + m).classList.add('text-white/40');
+    document.getElementById('tab-' + m).classList.remove('active');
   });
   document.getElementById('form-' + mode).classList.remove('hidden');
-  document.getElementById('tab-' + mode).classList.add('tab-active');
-  document.getElementById('tab-' + mode).classList.remove('text-white/40');
+  document.getElementById('tab-' + mode).classList.add('active');
 }
 
 function addFamilyMember() {
   const container = document.getElementById('family-members');
   const div = document.createElement('div');
-  div.className = 'family-member grid grid-cols-1 md:grid-cols-4 gap-3 p-4 rounded-xl bg-white/5';
+  div.className = 'family-member';
   div.innerHTML = `
-    <input name="names[]" type="text" placeholder="姓名" required class="h-11 px-4 rounded-xl">
-    <select name="genders[]" class="h-11 px-4 rounded-xl">
+    <input name="names[]" type="text" placeholder="姓名" required>
+    <select name="genders[]">
       <option value="女">女</option>
       <option value="男">男</option>
     </select>
-    <input name="dates[]" type="date" required class="h-11 px-4 rounded-xl">
-    <input name="times[]" type="time" value="12:00" required class="h-11 px-4 rounded-xl">
+    <input name="dates[]" type="date" required>
+    <input name="times[]" type="time" value="12:00" required>
   `;
   container.appendChild(div);
 }
