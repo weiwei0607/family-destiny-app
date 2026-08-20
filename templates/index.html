@@ -235,6 +235,20 @@ function addFamilyMember() {
   `;
   container.appendChild(div);
 }
+
+// 送出後鎖住按鈕並說明等待原因（伺服器休眠時喚醒最久約 40 秒）
+['form-personal', 'form-compatibility', 'form-family'].forEach(function (id) {
+  var form = document.getElementById(id);
+  if (!form) return;
+  form.addEventListener('submit', function () {
+    var btn = form.querySelector('button[type="submit"]');
+    if (!btn || btn.disabled) return;
+    btn.disabled = true;
+    btn.style.opacity = '0.75';
+    btn.style.cursor = 'wait';
+    btn.textContent = '計算中，首次啟動最久約 40 秒…';
+  });
+});
 </script>
 
 </body>
